@@ -1,0 +1,8 @@
+pandas
+python-docx
+torch
+torchvison
+modelscope
+transformers
+xtuner[all]==0.1.13.dev0
+lmdeploy[all]
