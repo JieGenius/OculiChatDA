@@ -7,5 +7,5 @@ transformers
 xtuner[all]
 lmdeploy[all]
 streamlit
-lagent
+lagent==0.1.3
 onnxruntime-gpu
