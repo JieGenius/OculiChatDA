@@ -1,8 +1,11 @@
 pandas
 python-docx
 torch
-torchvison
+torchvision
 modelscope
 transformers
-xtuner[all]==0.1.13.dev0
+xtuner[all]
 lmdeploy[all]
+streamlit
+lagent
+onnxruntime-gpu

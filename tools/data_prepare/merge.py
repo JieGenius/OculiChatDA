@@ -10,6 +10,20 @@ SYSTEM = """你是一名眼科专家，你需要解答患者的疑问，提供�
 
 SYSTEM_MED="""你是一名专业的医生，你需要解答患者的疑问，提供准确的回答，必要时，提醒患者及时挂号就医。
 """
+
+def judge_is_relative_to_eye(conversation):
+    keywords = [
+        "眼", "视力", "视网膜", "青光眼", "白内障", "糖尿病视网膜病变", "糖尿病",
+        "视神经", "视野", "OCT", "OCTA", "fundus", "eye", "网脱"
+    ]
+    for item in conversation:
+        for keyword in keywords:
+            if keyword in (item["input"] + item["output"]):
+                return True
+        # if "眼" in (item["input"] + item["output"]):
+        #     return True
+    return False
+
 def main():
     qa_data_path = [
         "data/processed_data/ophthalmology_9th Edition.json",
@@ -48,8 +62,10 @@ def main():
             })
         tmp["conversation"][0]["system"] = SYSTEM_MED
         counter_med_dialog[len(tmp["conversation"])] += 1
-
-        final_res.append(tmp)
+        # 判断是否和眼睛相关
+        flag = judge_is_relative_to_eye(tmp["conversation"])
+        if flag:
+            final_res.append(tmp)
     print(tmp)
     print("med_dialog的对话长度分布：", counter_med_dialog)
     print("med_dialog的对话长度总数：", sum(counter_med_dialog.values()))
@@ -72,8 +88,8 @@ def main():
     #
     # print("universal_corpus的对话长度总数：", universal_corpus_num)
     print("总对话长度：", len(final_res))
-    with open("data/processed_data/qa_data_500k.json", "w") as f:
-        json.dump(final_res[:500000], f, ensure_ascii=False, indent=4)
+    with open("data/processed_data/qa_data_eye.json", "w") as f:
+        json.dump(final_res, f, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
     main()

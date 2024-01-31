@@ -1,5 +1,14 @@
-# OculiChatDA
-眼科问诊大模型
+# OculiChatDA 眼科问诊大模型
+
+## 简介
+
+## NEWS
+
+## 介绍
+
+## 演示
+
+## 模型
 
 ## 环境安装
 ```bash
@@ -9,14 +18,6 @@ pip install -r requirements.txt
 ```
 
 ## 数据集
-### 通用语料数据集
-来自书生万卷1.0， 地址如下:
-[数据集地址](https://opendatalab.org.cn/OpenDataLab/WanJuan1_dot_0/tree/main/raw/nlp/CN/ChinaNews-cn)  part-006853-a894b46e.jsonl.tar.gz
-下载到 data/raw_data目录下
-
-### MSAgent数据集
-确保模型不会遗忘Agent能力 (暂未添加)
-
 ### 问诊数据集
 1. data/processed_data/ophthalmology_9th Edition.json
 2. data/processed_data/ophthalmology_qa.json
@@ -40,9 +41,11 @@ vim internlm2_chat_7b_qlora_med_dialog_e5.py # 修改配置文件
 ---> dataset=dict(type=load_dataset, path="json", data_files=dict(train=data_path)),
 ---> dataset_map_fn = None
 
+## Web Demo
+```bash
+streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860
+```
 # 开始训练
 xtuner train config/internlm2_chat_7b_qlora_med_dialog_e5_copy.py --deepspeed deepspeed_zero2 
 # 实测batch为4耗显存26G，需要开一个2 * 1/4的机器
-
 ```
-
