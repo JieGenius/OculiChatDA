@@ -82,9 +82,9 @@ class FundusDiagnosis(BaseAction):
         if glaucoma == 0 and dr == 0:
             res = '这张图表明您的眼睛状况良好，无青光眼和糖尿病视网膜病变'
         elif glaucoma == 1 and dr == 0:
-            res = '这张图表明您是一个青光眼患者。'
+            res = '这张图表明您是一个青光眼患者, 但无糖尿病视网膜病变'
         elif glaucoma == 0 and dr >= 1:
-            res = '这张图表明您是一个糖尿病视网膜病变患者, 且病变程度为' + str(dr)
+            res = '这张图表明您不是一个青光眼患者，但是糖尿病视网膜病变患者, 且病变程度为' + str(dr)
         elif glaucoma == 1 and dr >= 1:
             res = '这张图表明您是一个青光眼患者, 并且患有糖尿病视网膜病变，且病变程度为' + str(dr)
         return res
