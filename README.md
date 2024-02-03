@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://github.com/JieGenius/OculiChatDA/">
-    <img src="assets/logo.png" alt="Logo" width="30%">
+    <img src="assets/logo.png" alt="Logo" width="60%">
   </a>
 
 <h3 align="center">OculiChatDA</h3>
@@ -95,7 +95,7 @@ vim internlm2_chat_7b_qlora_med_dialog_e5.py # 修改配置文件
 
 ## Web Demo
 ```bash
-streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860
+streamlit run web_demo.py --server.port 7860 --server.enableStaticServing True
 ```
 # 训练
 ```bash

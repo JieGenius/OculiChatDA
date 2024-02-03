@@ -1,5 +1,7 @@
 import copy
 import os
+import re
+
 import streamlit as st
 from streamlit.logger import get_logger
 
@@ -51,15 +53,14 @@ class StreamlitUI:
         """Initialize Streamlit's UI settings."""
         st.set_page_config(
             layout='wide',
-            page_title='lagent-web',
-            page_icon='./docs/imgs/lagent_icon.png')
-        st.header(':robot_face: :blue[Oculi] Web Demo ', divider='rainbow')
-        st.sidebar.title('模型控制')
+            page_title='眼科问诊大模型',
+            page_icon='./assets/page_icon.png')
+        st.header(':male-doctor: :blue[OculiChatDA]', divider='rainbow')
+        st.sidebar.title('')
 
     def setup_sidebar(self):
         """Setup the sidebar for model and plugin selection."""
-        model_name = st.sidebar.selectbox(
-            '模型选择：', options=['internlm2'])
+        model_name = "internlm2"
         if model_name != st.session_state['model_selected']:
             model = self.init_model(model_name)
             self.session_state.clear_state()
@@ -69,11 +70,7 @@ class StreamlitUI:
         else:
             model = st.session_state['model_map'][model_name]
 
-        plugin_name = st.sidebar.multiselect(
-            '插件选择',
-            options=list(st.session_state['plugin_map'].keys()),
-            default=[list(st.session_state['plugin_map'].keys())[0]],
-        )
+        plugin_name = list(st.session_state['plugin_map'].keys())
 
         plugin_action = [
             st.session_state['plugin_map'][name] for name in plugin_name
@@ -81,18 +78,31 @@ class StreamlitUI:
         if 'chatbot' in st.session_state:
             st.session_state['chatbot']._action_executor = ActionExecutor(
                 actions=plugin_action)
-        if st.sidebar.button('清空对话', key='clear'):
+
+        st.sidebar.header("自我揭秘")
+        st.sidebar.markdown("你好！我是您的眼科问诊机器人，专业且贴心。我知道广泛的眼科知识，可以帮助您了解和诊断各种眼科疾病。")
+        st.sidebar.markdown("另外，我还具备**识别眼底图**的能力，这对于判断一些重要眼科疾病非常重要。通过分析眼底图，我能够帮助您了解是否存在青光眼或糖尿病视网膜病变等情况。")
+        st.sidebar.markdown("请随时向我提问，我将尽力为您提供专业的眼科建议和信息。您的眼健康，是我的首要关注点！")
+        # st.sidebar.write("---")
+        if st.sidebar.button('清空对话', key='clear', use_container_width=True):
             self.session_state.clear_state()
+        if "file_upload_key" not in st.session_state:
+            st.session_state.file_upload_key = 0
         uploaded_file = st.sidebar.file_uploader(
-            '上传文件', type=['png', 'jpg', 'jpeg'])
+            '眼底图文件', type=['png', 'jpg', 'jpeg'], key=st.session_state.file_upload_key)
         return model_name, model, plugin_action, uploaded_file
 
     def init_model(self, option):
         """Initialize the model based on the selected option."""
         if option not in st.session_state['model_map']:
-            st.session_state['model_map'][option] = HFTransformerCasualLM(
-                    '/share/model_repos/internlm2-chat-7b', meta_template=META)
+            st.session_state['model_map'][option] = self.load_internlm2()
         return st.session_state['model_map'][option]
+
+    @staticmethod
+    @st.cache_resource
+    def load_internlm2():
+        return HFTransformerCasualLM(
+            '/share/model_repos/internlm2-chat-7b', meta_template=META)
 
     def initialize_chatbot(self, model, plugin_action):
         """Initialize the chatbot with the given model and plugin actions."""
@@ -100,13 +110,20 @@ class StreamlitUI:
             llm=model, action_executor=ActionExecutor(actions=plugin_action))
 
     def render_user(self, prompt: str):
-        with st.chat_message('user'):
+        with st.chat_message('user', avatar="👦"):
+            st.markdown('''<style>
+             .stChatMessage img {
+                 width: 60%; 
+                 display: block;
+             } 
+             </style>''', unsafe_allow_html=True)
+
             st.markdown(prompt)
 
     def render_assistant(self, agent_return):
-        with st.chat_message('assistant'):
+        with st.chat_message('assistant', avatar="👨‍⚕️"): # 医生的avatar
             for action in agent_return.actions:
-                if (action):
+                if (action) and action.type == "FundusDiagnosis":
                     self.render_action(action)
             st.markdown(agent_return.response)
 
@@ -166,9 +183,9 @@ def main():
     else:
         st.set_page_config(
             layout='wide',
-            page_title='lagent-web',
-            page_icon='./docs/imgs/lagent_icon.png')
-        st.header(':robot_face: :blue[Lagent] Web Demo ', divider='rainbow')
+            page_title='眼科问诊大模型',
+            page_icon='./assets/page_icon.png')
+        st.header(':male-doctor: :blue[OculiChatDA]', divider='rainbow')
     model_name, model, plugin_action, uploaded_file = st.session_state[
         'ui'].setup_sidebar()
 
@@ -187,23 +204,30 @@ def main():
     # with st.form(key='my_form', clear_on_submit=True):
 
     if user_input := st.chat_input(''):
-        st.session_state['ui'].render_user(user_input)
-        st.session_state['user'].append(user_input)
         # Add file uploader to sidebar
         if uploaded_file:
             file_bytes = uploaded_file.read()
             file_type = uploaded_file.type
-            if 'image' in file_type:
-                st.image(file_bytes, caption='Uploaded Image')
 
             # Save the file to a temporary location and get the path
-            file_path = os.path.join(root_dir, uploaded_file.name)
+            if not os.path.exists("static"):
+                os.makedirs("static")
+            file_path = os.path.join("static", uploaded_file.name)
             with open(file_path, 'wb') as tmpfile:
                 tmpfile.write(file_bytes)
-            st.write(f'File saved at: {file_path}')
-            user_input = '我上传了一个图像，路径为: {file_path}. {user_input}'.format(
+            print(f'File saved at: {file_path}')
+            user_input_with_image_info = '我上传了一个图像，路径为: {file_path}. {user_input}'.format(
                 file_path=file_path, user_input=user_input)
-        agent_return = st.session_state['chatbot'].chat(user_input)
+            user_input_render = "{} \n![{}]({})".format(user_input, "眼底图", "app/" + file_path)
+            st.session_state.file_upload_key += 1 # 用于清除已经选择的文件
+        else:
+            user_input_with_image_info = user_input
+            user_input_render = user_input
+
+        st.session_state['ui'].render_user(user_input_render)
+        st.session_state['user'].append(user_input_render)
+
+        agent_return = st.session_state['chatbot'].chat(user_input_with_image_info)
         st.session_state['assistant'].append(copy.deepcopy(agent_return))
         logger.info("agent_return:",agent_return.inner_steps)
         st.session_state['ui'].render_assistant(agent_return)
