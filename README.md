@@ -19,7 +19,7 @@
 <h3 align="center">OculiChatDA</h3>
   <p align="center">
     <br />
-    <a href="/"> OpenXLab 体验</a>
+    <a href="https://openxlab.org.cn/apps/detail/helloworld/OculiChatDA"> OpenXLab 体验</a>
     ·
     <a href="https://github.com/JieGenius/OculiChatDA/issues">报告Bug & 提出新特性</a>
   </p>
@@ -41,12 +41,12 @@ OculiChatDA的问诊数据集包含了眼科问诊的常见问题，可以进行
 
 ## 演示
 
-Demo访问地址: [OculiChatDA](http://)
+Demo访问地址: [OculiChatDA](https://openxlab.org.cn/apps/detail/helloworld/OculiChatDA)
 
 ## 模型
 | 模型                  | 基座                | 数据量               | OpenXLab                                                                             
 |---------------------|-------------------|-------------------|----------------------------------------------------------------------------------------|
-| OculiChatDA-chat-7b | InternLM2-chat-7b | 500K个对话，对话轮次为1～64 | [![Open in OpenXLab](https://cdn-static.openxlab.org.cn/header/openxlab_models.svg)]() |
+| OculiChatDA-chat-7b | InternLM2-chat-7b | 500K个对话，对话轮次为1～64 | [![Open in OpenXLab](https://cdn-static.openxlab.org.cn/header/openxlab_models.svg)](https://openxlab.org.cn/models/detail/helloworld/OculiChatDA) |
 
 ## 环境安装
 ```bash
@@ -95,7 +95,7 @@ vim internlm2_chat_7b_qlora_med_dialog_e5.py # 修改配置文件
 
 ## Web Demo
 ```bash
-streamlit run web_demo.py --server.port 7860 --server.enableStaticServing True
+streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True
 ```
 # 训练
 ```bash
