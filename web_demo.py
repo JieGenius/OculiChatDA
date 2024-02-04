@@ -1,20 +1,18 @@
 import copy
 import os
-import re
 
 import streamlit as st
 from streamlit.logger import get_logger
 
 from lagent.actions import ActionExecutor
-from lagent.agents.react import ReAct, ReActProtocol
+from lagent.agents.react import ReActProtocol
 from lagent.llms.huggingface import HFTransformerCasualLM
 from utils.actions.fundus_diagnosis import FundusDiagnosis
 from lagent.llms.meta_template import INTERNLM2_META as META
 from utils.agent import MyReAct
 
-
 # MODEL_DIR = "/share/model_repos/internlm2-chat-7b-4bits"
-MODEL_DIR = "./OpenLMLab/InternLM-chat-7b"
+MODEL_DIR = "./OpenLMLab/InternLM2-chat-7b"
 CALL_PROTOCOL_CN = """你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。（请不要在回复中透露你的个人信息和工作单位)。
 你可以调用外部工具来帮助你解决问题。
 可以使用的工具包括：
@@ -35,13 +33,14 @@ CALL_PROTOCOL_CN = """你是一名眼科专家，可以通过文字和图片来�
 {finish}最终答案
 ```
 开始!"""
+
+
 class SessionState:
 
     def init_state(self):
         """Initialize session state variables."""
         st.session_state['assistant'] = []
         st.session_state['user'] = []
-
 
         cache_dir = "glaucoma_cls_dr_grading"
         model_path = os.path.join(cache_dir, "flyer123/GlauClsDRGrading", "model.onnx")
@@ -57,8 +56,7 @@ class SessionState:
         st.session_state['model_map'] = {}
         st.session_state['model_selected'] = None
         st.session_state['plugin_actions'] = set()
-        st.session_state["turn"] = 0 # 记录当前会话的轮次，第一轮需要添加system
-
+        st.session_state["turn"] = 0  # 记录当前会话的轮次，第一轮需要添加system
 
     def clear_state(self):
         """Clear the existing session state."""
@@ -107,8 +105,10 @@ class StreamlitUI:
                 actions=plugin_action)
 
         st.sidebar.header("自我揭秘")
-        st.sidebar.markdown("你好！我是您的眼科问诊机器人，专业且贴心。我知道广泛的眼科知识，可以帮助您了解和诊断各种眼科疾病。")
-        st.sidebar.markdown("另外，我还具备**识别眼底图**的能力，这对于判断一些重要眼科疾病非常重要。通过分析眼底图，我能够帮助您了解是否存在青光眼或糖尿病视网膜病变等情况。")
+        st.sidebar.markdown(
+            "你好！我是您的眼科问诊机器人，专业且贴心。我知道广泛的眼科知识，可以帮助您了解和诊断各种眼科疾病。")
+        st.sidebar.markdown(
+            "另外，我还具备**识别眼底图**的能力，这对于判断一些重要眼科疾病非常重要。通过分析眼底图，我能够帮助您了解是否存在青光眼或糖尿病视网膜病变等情况。")
         st.sidebar.markdown("请随时向我提问，我将尽力为您提供专业的眼科建议和信息。您的眼健康，是我的首要关注点！")
         # st.sidebar.write("---")
         if st.sidebar.button('清空对话', key='clear', use_container_width=True):
@@ -128,12 +128,13 @@ class StreamlitUI:
     @staticmethod
     @st.cache_resource
     def load_internlm2():
-        return HFTransformerCasualLM(MODEL_DIR, meta_template=META,model_kwargs={"device_map": "cuda"})
+        return HFTransformerCasualLM(MODEL_DIR, meta_template=META, model_kwargs={"device_map": "cuda"})
 
     def initialize_chatbot(self, model, plugin_action):
         """Initialize the chatbot with the given model and plugin actions."""
         return MyReAct(
-            llm=model, action_executor=ActionExecutor(actions=plugin_action), protocol=ReActProtocol(call_protocol=CALL_PROTOCOL_CN))
+            llm=model, action_executor=ActionExecutor(actions=plugin_action),
+            protocol=ReActProtocol(call_protocol=CALL_PROTOCOL_CN))
 
     def render_user(self, prompt: str):
         with st.chat_message('user', avatar="👦"):
@@ -147,7 +148,7 @@ class StreamlitUI:
             st.markdown(prompt)
 
     def render_assistant(self, agent_return):
-        with st.chat_message('assistant', avatar="👨‍⚕️"): # 医生的avatar
+        with st.chat_message('assistant', avatar="👨‍⚕️"):  # 医生的avatar
             for action in agent_return.actions:
                 if (action) and action.type == "FundusDiagnosis":
                     self.render_action(action)
@@ -241,15 +242,15 @@ def main():
             file_path = os.path.join("static", uploaded_file.name)
             with open(file_path, 'wb') as tmpfile:
                 tmpfile.write(file_bytes)
-            print(f'File saved at: {file_path}')
+            logger.info(f'File saved at: {file_path}')
             user_input_with_image_info = '我上传了一个图像，路径为: {file_path}. {user_input}'.format(
                 file_path=file_path, user_input=user_input)
             user_input_render = "{} \n![{}]({})".format(user_input, "眼底图", "app/" + file_path)
-            st.session_state.file_upload_key += 1 # 用于清除已经选择的文件
+            st.session_state.file_upload_key += 1  # 用于清除已经选择的文件
         else:
             user_input_with_image_info = user_input
             user_input_render = user_input
-
+        logger.info("获取到用户输入：" + user_input)
         st.session_state['ui'].render_user(user_input_render)
         st.session_state['user'].append(user_input_render)
 

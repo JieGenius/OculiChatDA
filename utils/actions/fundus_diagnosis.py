@@ -7,11 +7,15 @@ import onnxruntime as ort
 from lagent.schema import ActionReturn, ActionStatusCode
 from lagent.actions import BaseAction
 from utils.transform import resized_edge, center_crop
+from streamlit.logger import get_logger
+
 DEFAULT_DESCRIPTION = """一个眼底图像诊断的工具，
 可以诊断眼底图像中的病变类型，如青光眼、是否为糖尿病视网膜病变。
 输入为眼底图的图像路径，可以为本地地址，也可以为网络地址(链接)
 当且仅当用户上传了图片时，才可调用本工具。
 """
+logger = get_logger(__name__)
+
 
 class FundusDiagnosis(BaseAction):
     def __init__(self,
@@ -30,8 +34,6 @@ class FundusDiagnosis(BaseAction):
 
             self.model = ort.InferenceSession(model_path, providers=providers, )
 
-
-
     def __call__(self, query: str) -> ActionReturn:
         """Return the image recognition response.
 
@@ -42,9 +44,9 @@ class FundusDiagnosis(BaseAction):
             ActionReturn: The action return.
         """
         # {"image_path": "/root/GlauClsDRGrading/data/refuge/images/g0001.jpg"} 传入的是这样的字符串
-        print("query: ", query)
+        logger.info("query: " + query)
         if query.startswith("{"):
-            query = query.replace("'", "\"") # 为了解决如下错误：{'image_path':'static/lwh017-20180821-OD-1.jpg'}
+            query = query.replace("'", "\"")  # 为了解决如下错误：{'image_path':'static/lwh017-20180821-OD-1.jpg'}
             query = json.loads(query)
             if not (isinstance(query, dict) and ("image_path" in query or "value" in query)):
                 response = "输入参数错误，请确定是否需要调用该工具"
@@ -67,11 +69,11 @@ class FundusDiagnosis(BaseAction):
         return tool_return
 
     def _fundus_diagnosis(self, query: str) -> str:
-        print("Enter Image Recognition entry\n\n\n\ns")
+        logger.info("Enter Image Recognition entry\n\n\n\ns")
         # data = json.loads(query)
 
         image_path = query
-        print("查询是: ", query)
+        logger.info("查询是: " + query)
         if not os.path.exists(image_path):
             return "由于图片路径无效，无法进行有效诊断"
         img = cv2.imread(image_path)
@@ -81,7 +83,7 @@ class FundusDiagnosis(BaseAction):
         mean = [0.48145466 * 255, 0.4578275 * 255, 0.40821073 * 255],
         std = [0.26862954 * 255, 0.26130258 * 255, 0.27577711 * 255],
         img = (img - mean) / std
-        img = img[...,::-1] # bgr to rgb
+        img = img[..., ::-1]  # bgr to rgb
         img = img.transpose((2, 0, 1))
         img = img.astype('float32')
         img = img[np.newaxis, ...]
