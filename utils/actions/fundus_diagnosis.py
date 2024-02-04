@@ -44,14 +44,18 @@ class FundusDiagnosis(BaseAction):
         # {"image_path": "/root/GlauClsDRGrading/data/refuge/images/g0001.jpg"} 传入的是这样的字符串
         print("query: ", query)
         if query.startswith("{"):
+            query = query.replace("'", "\"") # 为了解决如下错误：{'image_path':'static/lwh017-20180821-OD-1.jpg'}
             query = json.loads(query)
-            if not (isinstance(query, dict) and "image_path" in query):
+            if not (isinstance(query, dict) and ("image_path" in query or "value" in query)):
                 response = "输入参数错误，请确定是否需要调用该工具"
                 tool_return = ActionReturn(url=None, args=None, type=self.name)
                 tool_return.result = dict(text=str(response))
                 tool_return.state = ActionStatusCode.API_ERROR
                 return tool_return
-            query = query["image_path"]
+            if "image_path" in query:
+                query = query["image_path"]
+            else:
+                query = query["value"]
         tool_return = ActionReturn(url=None, args=None, type=self.name)
         try:
             response = self._fundus_diagnosis(query)

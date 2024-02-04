@@ -2,6 +2,8 @@ from lagent.agents import ReAct
 from lagent import AgentReturn, ActionReturn
 import copy
 from transformers import GenerationConfig
+import time
+
 class MyReAct(ReAct):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -11,6 +13,7 @@ class MyReAct(ReAct):
         self._inner_history.append(dict(role='user', content=message))
         agent_return = AgentReturn()
         default_response = 'Sorry that I cannot answer your question.'
+        start = time.time()
         gen_config = GenerationConfig(
             max_new_tokens=2048,
             do_sample=True,
@@ -19,21 +22,25 @@ class MyReAct(ReAct):
             top_k=40,
             repetition_penalty=1.002,
         )
-
         for turn in range(self.max_turn):
+            for_start = time.time()
             prompt = self._protocol.format(
                 chat_history=self.session_history,
                 inner_step=self._inner_history,
                 action_executor=self._action_executor,
                 force_stop=(turn == self.max_turn - 1))
+            s1 = time.time()
             response = self._llm.generate_from_template(prompt, 512, generation_config=gen_config)
+            print(f"response生成用时：{time.time() - s1}秒")
             self._inner_history.append(
                 dict(role='assistant', content=response))
             thought, action, action_input = self._protocol.parse(
                 response, self._action_executor)
+            s2 = time.time()
+
             action_return: ActionReturn = self._action_executor(
                 action, action_input)
-
+            print(f"exectue action用时：{time.time() - s2}秒")
             if action_return.type == "NoAction":
                 # 没有获取到action的情况
                 action_return.thought = "该回答不需要调用任何Action"
@@ -49,6 +56,7 @@ class MyReAct(ReAct):
                 dict(
                     role='system',
                     content=self._protocol.format_response(action_return)))
+            print(f"第{turn + 1}轮对话用时：{time.time() - for_start}秒")
         else:
             agent_return.response = default_response
         agent_return.inner_steps = copy.deepcopy(self._inner_history)

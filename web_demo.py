@@ -128,8 +128,7 @@ class StreamlitUI:
     @staticmethod
     @st.cache_resource
     def load_internlm2():
-        return HFTransformerCasualLM(
-        MODEL_DIR, meta_template=META)
+        return HFTransformerCasualLM(MODEL_DIR, meta_template=META,model_kwargs={"device_map": "cuda"})
 
     def initialize_chatbot(self, model, plugin_action):
         """Initialize the chatbot with the given model and plugin actions."""

@@ -93,14 +93,13 @@ vim internlm2_chat_7b_qlora_med_dialog_e5.py # 修改配置文件
 ---> dataset=dict(type=load_dataset, path="json", data_files=dict(train=data_path)),
 ---> dataset_map_fn = None
 
+xtuner train config/internlm2_chat_7b_qlora_med_dialog_e5_copy.py --deepspeed deepspeed_zero2 
+# 实测batch为4耗显存26G，需要开一个2 * 1/4的机器
+```
+
 ## Web Demo
 ```bash
 streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True
-```
-# 训练
-```bash
-xtuner train config/internlm2_chat_7b_qlora_med_dialog_e5_copy.py --deepspeed deepspeed_zero2 
-# 实测batch为4耗显存26G，需要开一个2 * 1/4的机器
 ```
 
 ## TODO
