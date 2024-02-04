@@ -14,7 +14,7 @@ from utils.agent import MyReAct
 
 
 # MODEL_DIR = "/share/model_repos/internlm2-chat-7b"
-MODEL_DIR = "/root/OculiChatDA/merged_model_e1"
+MODEL_DIR = "OculiChaDAModel"
 CALL_PROTOCOL_CN = """你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。（请不要在回复中透露你的个人信息和工作单位)。
 你可以调用外部工具来帮助你解决问题。
 可以使用的工具包括：
