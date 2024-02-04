@@ -255,7 +255,7 @@ def main():
 
         agent_return = st.session_state['chatbot'].chat(user_input_with_image_info)
         st.session_state['assistant'].append(copy.deepcopy(agent_return))
-        logger.info("agent_return:",agent_return.inner_steps)
+        logger.info("agent_return:" + str(agent_return.inner_steps))
         st.session_state['ui'].render_assistant(agent_return)
         st.session_state["turn"] += 1
 
