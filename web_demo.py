@@ -6,12 +6,35 @@ import streamlit as st
 from streamlit.logger import get_logger
 
 from lagent.actions import ActionExecutor
-from lagent.agents.react import ReAct
-from modelscope import snapshot_download
+from lagent.agents.react import ReAct, ReActProtocol
 from lagent.llms.huggingface import HFTransformerCasualLM
 from utils.actions.fundus_diagnosis import FundusDiagnosis
 from lagent.llms.meta_template import INTERNLM2_META as META
+from utils.agent import MyReAct
 
+
+# MODEL_DIR = "/share/model_repos/internlm2-chat-7b"
+MODEL_DIR = "/root/OculiChatDA/merged_model_e1"
+CALL_PROTOCOL_CN = """你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。（请不要在回复中透露你的个人信息和工作单位)。
+你可以调用外部工具来帮助你解决问题。
+可以使用的工具包括：
+{tool_description}
+如果使用工具请遵循以下格式回复：
+```
+{thought}思考你当前步骤需要解决什么问题，是否需要使用工具
+{action}工具名称，你的工具必须从 [{action_names}] 选择
+{action_input}工具输入参数
+```
+工具返回按照以下格式回复：
+```
+{response}调用工具后的结果
+```
+如果你已经知道了答案，或者你不需要工具，请遵循以下格式回复
+```
+{thought}给出最终答案的思考过程
+{finish}最终答案
+```
+开始!"""
 class SessionState:
 
     def init_state(self):
@@ -23,6 +46,7 @@ class SessionState:
         cache_dir = "glaucoma_cls_dr_grading"
         model_path = os.path.join(cache_dir, "flyer123/GlauClsDRGrading", "model.onnx")
         if not os.path.exists(model_path):
+            from modelscope import snapshot_download
             snapshot_download("flyer123/GlauClsDRGrading", cache_dir=cache_dir)
 
         action_list = [FundusDiagnosis(model_path=model_path)]
@@ -33,12 +57,15 @@ class SessionState:
         st.session_state['model_map'] = {}
         st.session_state['model_selected'] = None
         st.session_state['plugin_actions'] = set()
+        st.session_state["turn"] = 0 # 记录当前会话的轮次，第一轮需要添加system
+
 
     def clear_state(self):
         """Clear the existing session state."""
         st.session_state['assistant'] = []
         st.session_state['user'] = []
         st.session_state['model_selected'] = None
+        st.session_state["turn"] = 0
         if 'chatbot' in st.session_state:
             st.session_state['chatbot']._session_history = []
 
@@ -102,12 +129,12 @@ class StreamlitUI:
     @st.cache_resource
     def load_internlm2():
         return HFTransformerCasualLM(
-            '/share/model_repos/internlm2-chat-7b', meta_template=META)
+        MODEL_DIR, meta_template=META)
 
     def initialize_chatbot(self, model, plugin_action):
         """Initialize the chatbot with the given model and plugin actions."""
-        return ReAct(
-            llm=model, action_executor=ActionExecutor(actions=plugin_action))
+        return MyReAct(
+            llm=model, action_executor=ActionExecutor(actions=plugin_action), protocol=ReActProtocol(call_protocol=CALL_PROTOCOL_CN))
 
     def render_user(self, prompt: str):
         with st.chat_message('user', avatar="👦"):
@@ -231,10 +258,20 @@ def main():
         st.session_state['assistant'].append(copy.deepcopy(agent_return))
         logger.info("agent_return:",agent_return.inner_steps)
         st.session_state['ui'].render_assistant(agent_return)
+        st.session_state["turn"] += 1
 
 
 if __name__ == '__main__':
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     root_dir = os.path.join(root_dir, 'tmp_dir')
     os.makedirs(root_dir, exist_ok=True)
+
+    if not os.path.exists(MODEL_DIR):
+        from openxlab.model import download
+
+        download(model_repo='OpenLMLab/internlm2-chat-7b', output=MODEL_DIR)
+
+        print("解压后目录结果如下：")
+        print(os.listdir(MODEL_DIR))
+
     main()

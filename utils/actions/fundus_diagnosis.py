@@ -10,6 +10,7 @@ from utils.transform import resized_edge, center_crop
 DEFAULT_DESCRIPTION = """一个眼底图像诊断的工具，
 可以诊断眼底图像中的病变类型，如青光眼、是否为糖尿病视网膜病变。
 输入为眼底图的图像路径，可以为本地地址，也可以为网络地址(链接)
+当且仅当用户上传了图片时，才可调用本工具。
 """
 
 class FundusDiagnosis(BaseAction):

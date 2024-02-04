@@ -9,3 +9,4 @@ lmdeploy[all]
 streamlit
 lagent==0.1.3
 onnxruntime-gpu
+openxlab
