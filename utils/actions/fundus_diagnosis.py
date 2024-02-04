@@ -47,7 +47,13 @@ class FundusDiagnosis(BaseAction):
         logger.info("query: " + query)
         if query.startswith("{"):
             query = query.replace("'", "\"")  # 为了解决如下错误：{'image_path':'static/lwh017-20180821-OD-1.jpg'}
-            query = json.loads(query)
+            try:
+                query = json.loads(query)
+            except:
+                t = ActionReturn(url=None, args=None, type=self.name, )
+                t.result = "输入参数格式参数，输入需要为str:image_path"
+                t.state = ActionStatusCode.API_ERROR
+                return t
             if not (isinstance(query, dict) and ("image_path" in query or "value" in query)):
                 response = "输入参数错误，请确定是否需要调用该工具"
                 tool_return = ActionReturn(url=None, args=None, type=self.name)

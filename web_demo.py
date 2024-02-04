@@ -117,6 +117,7 @@ class StreamlitUI:
             st.session_state.file_upload_key = 0
         uploaded_file = st.sidebar.file_uploader(
             '眼底图文件', type=['png', 'jpg', 'jpeg'], key=st.session_state.file_upload_key)
+        st.sidebar.download_button(label="下载眼底图测试用例", data=open("assets/test_case.zip", "rb").read(), file_name="test_case.zip", mime="application/zip")
         return model_name, model, plugin_action, uploaded_file
 
     def init_model(self, option):
