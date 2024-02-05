@@ -10,6 +10,7 @@ from lagent.llms.huggingface import HFTransformerCasualLM
 from utils.actions.fundus_diagnosis import FundusDiagnosis
 from lagent.llms.meta_template import INTERNLM2_META as META
 from utils.agent import MyReAct
+from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 # MODEL_DIR = "/share/model_repos/internlm2-chat-7b-4bits"
 MODEL_DIR = "./OpenLMLab/InternLM2-chat-7b"
@@ -251,7 +252,7 @@ def main():
         else:
             user_input_with_image_info = user_input
             user_input_render = user_input
-        logger.info("获取到用户输入：" + user_input + f" session id: {st.session_state.session_id}")
+        logger.info("获取到用户输入：" + user_input + f" session id: {get_script_run_ctx().session_id}")
         st.session_state['ui'].render_user(user_input_render)
         st.session_state['user'].append(user_input_render)
 
