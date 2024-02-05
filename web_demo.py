@@ -253,8 +253,8 @@ def main():
             user_input_with_image_info = user_input
             user_input_render = user_input
         logger.info("获取到用户输入：" + user_input + f" session id: {get_script_run_ctx().session_id}")
-        st.session_state['ui'].render_user(user_input_render)
         st.session_state['user'].append(user_input_render)
+        st.session_state['ui'].render_user(user_input_render)
 
         agent_return = st.session_state['chatbot'].chat(user_input_with_image_info)
         st.session_state['assistant'].append(copy.deepcopy(agent_return))
