@@ -10,4 +10,3 @@ streamlit
 lagent==0.2.2
 onnxruntime-gpu
 openxlab
---index-url https://download.pytorch.org/whl/cu118 # https://github.com/InternLM/lmdeploy/issues/1169
