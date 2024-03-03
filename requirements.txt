@@ -1,7 +1,7 @@
 pandas
 python-docx
 torch==2.0.1
-torchvision==0.15.1
+torchvision
 modelscope
 transformers
 xtuner[all]
