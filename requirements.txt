@@ -1,6 +1,6 @@
 pandas
 python-docx
-torch==2.0.1
+torch
 torchvision
 modelscope
 transformers
