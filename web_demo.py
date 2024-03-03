@@ -2,6 +2,7 @@ import copy
 import hashlib
 import json
 import os
+import re
 
 import streamlit as st
 
@@ -20,10 +21,10 @@ MODEL_NAME = "internlm2-chat-7b"
 OculiChatDA_META_CN = ("你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。\n"
                        "你的工作单位为**某三家医院**\n"
                        "你可以调用外部工具来帮助帮助用户解决问题")
-OculiChatDA_META_CN = OculiChatDA_META_CN # + "\n".join(ReActCALL_PROTOCOL_CN.split("\n")[1:])
+OculiChatDA_META_CN = OculiChatDA_META_CN  # + "\n".join(ReActCALL_PROTOCOL_CN.split("\n")[1:])
 PLUGIN_CN = """你可以使用如下工具：
 {prompt}
-如果你已经获得足够信息，请直接给出答案. 避免不必要的工具调用!
+**如果你已经获得足够信息，请直接给出答案. 避免重复或不必要的工具调用!**
 如果使用工具请遵循以下格式回复：
 ```
 开始执行工具<|action_start|><|plugin|>
@@ -34,10 +35,11 @@ PLUGIN_CN = """你可以使用如下工具：
 <|action_end|>
 ```
 其中<|action_start|><|plugin|>必须原样复制，表示开始执行工具
-'同时注意你可以使用的工具，不要随意捏造！'
+同时注意你可以使用的工具，不要随意捏造！
 """
 
 FUNDUS_DIAGNOSIS_MODEL_PATH = "glaucoma_cls_dr_grading"
+
 
 class SessionState:
 
@@ -50,7 +52,6 @@ class SessionState:
         if not os.path.exists(model_path):
             from modelscope import snapshot_download
             snapshot_download("flyer123/GlauClsDRGrading", cache_dir=FUNDUS_DIAGNOSIS_MODEL_PATH)
-
 
         action_list = [
             FundusDiagnosis(model_path=model_path),
@@ -166,7 +167,19 @@ class StreamlitUI:
 
     def render_user(self, prompt: str):
         with st.chat_message('user'):
-            st.markdown(prompt)
+            img_paths = re.findall(r'\!\[.*?\]\((.*?)\)', prompt, re.DOTALL)  # 允许皮配\n等空字符
+            if len(img_paths):
+                st.markdown(re.sub(r'!\[.*\]\(.*\)', '', prompt))  # 先渲染非图片部分
+                # 再渲染图片
+                img_path = img_paths[0]
+                st.write(
+                    f'<img src="app/{img_path}" style="width: 40%;">',
+                    unsafe_allow_html=True
+                )
+                # if os.path.exists(img_path):
+                #     st.image(open(img_path, 'rb').read(), caption='Uploaded Image', width=400)
+            else:
+                st.markdown(prompt)
 
     def render_assistant(self, agent_return):
         with st.chat_message('assistant'):
@@ -299,7 +312,7 @@ def main():
                     content=json.dumps(dict(path=file_path, size=file_size)),
                     name='眼底图')
             ]
-            st.session_state['user'].append(f"我上传了一张眼底图，图像如下：[眼底图图像路径]({file_path})")
+            st.session_state['user'][-1] = st.session_state['user'][-1] + f"\n ![眼底图图像路径]({file_path})"
         if isinstance(user_input, str):
             user_input = [dict(role='user', content=user_input)]
         st.session_state['last_status'] = AgentStatusCode.SESSION_READY
@@ -347,7 +360,6 @@ def main():
 
 
 if __name__ == '__main__':
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    root_dir = os.path.join(root_dir, 'tmp_dir')
+    root_dir = 'static'
     os.makedirs(root_dir, exist_ok=True)
     main()

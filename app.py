@@ -12,8 +12,7 @@ if __name__ == '__main__':
 
         print("解压后目录结果如下：")
         print(os.listdir(MODEL_DIR))
-
-    os.system(
-        "lmdeploy serve api_server /root/share/model_repos/internlm2-chat-7b --server-name 0.0.0.0 --server-port 23333 --tp 1 --cache-max-entry-count 0.5 --model-format hf >/dev/null 2>&1 &")
-    time.sleep(60)
-    os.system('streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True')
+        os.system(f"lmdeploy convert internlm2-chat-7b {MODEL_DIR}")
+    os.system("lmdeploy serve api_server ./workspace --server-name 0.0.0.0 --server-port 23333 --tp 1 --cache-max-entry-count 0.5 >/dev/null 2>&1 &")
+    time.sleep(5)
+    os.system('streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True --server.enableStaticServing true')
