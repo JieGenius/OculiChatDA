@@ -19,7 +19,7 @@
 <h3 align="center">OculiChatDA</h3>
   <p align="center">
     <br />
-    <a href="https://openxlab.org.cn/apps/detail/helloworld/OculiChatDA"> OpenXLab 体验</a>
+    <a href="https://openxlab.org.cn/apps/detail/flyer/oculi_chat_diagnosis_assistant"> OpenXLab 体验</a>
     ·
     <a href="https://github.com/JieGenius/OculiChatDA/issues">报告Bug & 提出新特性</a>
   </p>
