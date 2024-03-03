@@ -1,7 +1,7 @@
 pandas
 python-docx
-torch
-torchvision
+# torch
+# torchvision
 modelscope
 transformers
 xtuner[all]

@@ -3,7 +3,7 @@ import hashlib
 import json
 import os
 import re
-
+import torch
 import streamlit as st
 
 from lagent.actions import ActionExecutor
@@ -356,6 +356,11 @@ def main():
 
 
 if __name__ == '__main__':
+    print("torch.cuda.is_available():", torch.cuda.is_available())
+    print("torch.__version__:", torch.__version__)
+    print("torch.version.cuda:", torch.version.cuda)
+    print("torch.cuda.get_device_name(0):", torch.cuda.get_device_name(0))
+    print("nvidia-smi:", os.popen('nvidia-smi').read())
     root_dir = 'static'
     os.makedirs(root_dir, exist_ok=True)
     main()

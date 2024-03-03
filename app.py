@@ -7,7 +7,7 @@ MODEL_DIR = "models/"
 MODEL_REPOSITORY_OPENXLAB = "OpenLMLab/internlm2-chat-7b"
 
 if __name__ == '__main__':
-    print("ls /usr/local")
+    os.system("ls /usr/local")
     if not os.path.exists(MODEL_DIR):
         from openxlab.model import download
 
@@ -16,6 +16,6 @@ if __name__ == '__main__':
         print("解压后目录结果如下：")
         print(os.listdir(MODEL_DIR))
         os.system(f"lmdeploy convert internlm2-chat-7b {MODEL_DIR}")
-    os.system("lmdeploy serve api_server ./workspace --server-name 0.0.0.0 --server-port 23333 --tp 1 --cache-max-entry-count 0.5 >/dev/null 2>&1 &")
+    os.system("lmdeploy serve api_server ./workspace --server-name 0.0.0.0 --server-port 23333 --tp 1 --cache-max-entry-count 0.5 &")
     time.sleep(5)
     os.system('streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True --server.enableStaticServing true')
