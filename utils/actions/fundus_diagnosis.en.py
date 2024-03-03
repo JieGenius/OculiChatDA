@@ -26,21 +26,23 @@ class FundusDiagnosis(BaseAction):
 
     @tool_api(explode_return=True)
     def fundus_diagnosis(self, fundus_path: str) -> dict:
-        """运行眼底疾病诊断，可实现青光眼二分类和糖尿病视网膜病变5分级
+        """Run fundus disease diagnostics and return diagnostic results.
+        Diagnosable diseases include diabetic retinopathy and glaucoma.
+        This tool is only available after the user has uploaded an image
 
         Args:
-            fundus_path (str): 眼底图像的路径
+            fundus_path (str): the path of fundus
 
         Returns:
-            :class:`dict`: 诊断结果
-              * msg (str): 工具调用是否成功的说明
-              * glaucoma (int): 0代表青光眼，1代表非青光眼
-              * dr_level (int): 糖尿病视网膜病变的等级，0代表健康，4代表患病程度最严重
-                                0 为健康
-                                1 代表轻度非增生性的糖尿病视网膜病变
-                                2 中度
-                                3 重度
-                                4 增生性糖尿病视网膜病变
+            :class:`dict`: the diagnostic results
+              * msg (str): An illustration about state of tool process
+              * glaucoma (int): 0 denotes a non-glaucoma patient, 1 denotes a suspected glaucoma
+              * dr_level (int): the diabetic retinopathy level.
+                                0 is healthy
+                                1 denotes Mild Nonproliferative Retinopathy
+                                2 denotes Moderate Nonproliferative Retinopathy
+                                3 denotes Severe Nonproliferative Retinopathy
+                                4 denotes Proliferative Retinopathy
 
         """
         image_path = fundus_path
@@ -65,4 +67,4 @@ class FundusDiagnosis(BaseAction):
 
         glaucoma = output[0][0].argmax()
         dr = output[1][0].argmax()
-        return dict(glaucoma=int(glaucoma), dr_level=int(dr), msg="运行成功")
+        return dict(glaucoma=glaucoma, dr_level=dr, msg="运行成功")
