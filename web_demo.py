@@ -117,12 +117,8 @@ class StreamlitUI:
             st.session_state['chatbot']._interpreter_executor = None
 
         st.sidebar.header("自我揭秘")
-        st.sidebar.markdown(
-            "你好！我是您的眼科问诊机器人，专业且贴心。我知道广泛的眼科知识，可以帮助您了解和诊断各种眼科疾病。")
-        st.sidebar.markdown(
-            "另外，我还具备**识别眼底图**的能力，这对于判断一些重要眼科疾病非常重要。通过分析眼底图，我能够帮助您了解是否存在青光眼或糖尿病视网膜病变等情况。")
-        st.sidebar.markdown("请随时向我提问，我将尽力为您提供专业的眼科建议和信息。您的眼健康，是我的首要关注点！")
-
+        st.sidebar.markdown("我是您的眼科问诊机器人，你可以问我所有的眼科疾病和眼科药品信息。"
+                            "如果有需要的话，我可以通过识别眼底图来帮助诊断 **青光眼** 和 **糖尿病视网膜病变** 。")
         if st.sidebar.button('清空对话', key='clear'):
             self.session_state.clear_state()
         uploaded_file = st.sidebar.file_uploader('上传文件')

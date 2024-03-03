@@ -1,6 +1,8 @@
 import os
 import time
 
+os.system("pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118")
+
 MODEL_DIR = "models/"
 MODEL_REPOSITORY_OPENXLAB = "OpenLMLab/internlm2-chat-7b"
 

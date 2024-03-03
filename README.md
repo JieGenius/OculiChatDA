@@ -160,5 +160,7 @@ streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.e
 ```
 
 ## TODO
+- [ ] 语音问诊
+- [ ] 视频问诊，数字人接入。 
 - [ ] 问诊数据集扩充，增加更多真实的问诊数据
 - [ ] Agent能力扩充，识别更多的眼病（如中心性浆液，病理性近视，视网膜脱离等），更多的模态（如OCT，裂隙灯，眼表照相等），
