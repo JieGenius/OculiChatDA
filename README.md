@@ -49,7 +49,7 @@ Demo访问地址: [OculiChatDA](https://openxlab.org.cn/apps/detail/helloworld/O
 ## 模型
 | 模型                  | 基座                | 数据量               | OpenXLab                                                                             
 |---------------------|-------------------|-------------------|----------------------------------------------------------------------------------------|
-| OculiChatDA-chat-7b | InternLM2-chat-7b | 500K个对话，对话轮次为1～64 | [![Open in OpenXLab](https://cdn-static.openxlab.org.cn/header/openxlab_models.svg)](https://openxlab.org.cn/models/detail/helloworld/OculiChatDA) |
+| OculiChatDA-chat-7b | InternLM2-chat-7b | 500K个对话，对话轮次为1～64 | [![Open in OpenXLab](https://cdn-static.openxlab.org.cn/header/openxlab_models.svg)](https://openxlab.org.cn/models/detail/flyer/OculiChatDA) |
 
 ## 环境安装
 ```bash
@@ -135,7 +135,7 @@ xtuner chat ./merged --prompt-template internlm2_chat
 
 继续输入:
 
-    我上传了一张图片，图片路径为/a/b/c.jpg 情判断我是否患有青光眼
+    我上传了一张图片，图片路径为/a/b/c.jpg q请判断我是否患有青光眼
 
 模型输出:
 
@@ -154,6 +154,14 @@ lmdeploy convert internlm2-chat-7b  ./merged
 lmdeploy serve api_server ./workspace --server-name 0.0.0.0 --server-port 23333 --tp 1
 ```
 
+## 模型上传
+```bash
+python model_upload/convert.py
+openxlab login
+cd merged
+openxlab model create --model-repo='flyer/OculiChatDA' -s ./metafile.yml
+
+```
 ## Web Demo
 ```bash
 streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True

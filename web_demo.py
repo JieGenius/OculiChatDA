@@ -13,13 +13,18 @@ from lagent.llms.lmdepoly_wrapper import LMDeployClient
 from lagent.llms.meta_template import INTERNLM2_META as META
 from lagent.schema import AgentStatusCode
 from utils.actions.fundus_diagnosis import FundusDiagnosis
-
+import base64
 # from streamlit.logger import get_logger
 LMDEPLOY_IP = "0.0.0.0:23333"
 MODEL_NAME = "internlm2-chat-7b"
 
 OculiChatDA_META_CN = ("你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。\n"
                        "你的工作单位为**某三家医院**\n"
+                       "你有以下三种能力:\n"
+                       "1. 诊断眼底疾病，包括青光眼和糖尿病视网膜病变\n"
+                       "2. 眼科常见疾病诊断，疾病解答，疾病预防等\n"
+                       "3. 眼科药品信息查询\n" 
+                       "你可以主动询问用户基本信息，比如年龄，用眼频率，用眼环境等等，请时刻保持耐心且细致的回答"
                        "你可以调用外部工具来帮助帮助用户解决问题")
 OculiChatDA_META_CN = OculiChatDA_META_CN  # + "\n".join(ReActCALL_PROTOCOL_CN.split("\n")[1:])
 PLUGIN_CN = """你可以使用如下工具：
@@ -165,7 +170,7 @@ class StreamlitUI:
         with st.chat_message('user'):
             img_paths = re.findall(r'\!\[.*?\]\((.*?)\)', prompt, re.DOTALL)  # 允许皮配\n等空字符
             if len(img_paths):
-                st.markdown(re.sub(r'!\[.*\]\(.*\)', '', prompt))  # 先渲染非图片部分
+                st.markdown(re.sub(r'!\[.*\]\(.*\)', '', prompt.replace("\\n", " \\n ")))  # 先渲染非图片部分
                 # 再渲染图片
                 img_path = img_paths[0]
                 st.write(
@@ -175,7 +180,7 @@ class StreamlitUI:
                 # if os.path.exists(img_path):
                 #     st.image(open(img_path, 'rb').read(), caption='Uploaded Image', width=400)
             else:
-                st.markdown(prompt)
+                st.markdown(prompt.replace("\\n", " \\n "))
 
     def render_assistant(self, agent_return):
         with st.chat_message('assistant'):
@@ -284,7 +289,7 @@ def main():
             file_bytes = uploaded_file.read()
             file_type = uploaded_file.type
             if 'image' in file_type:
-                st.image(file_bytes, caption='Uploaded Image')
+                st.image(file_bytes, caption='Uploaded Image', width=600)
             elif 'video' in file_type:
                 st.video(file_bytes, caption='Uploaded Video')
             elif 'audio' in file_type:
@@ -356,11 +361,6 @@ def main():
 
 
 if __name__ == '__main__':
-    print("torch.cuda.is_available():", torch.cuda.is_available())
-    print("torch.__version__:", torch.__version__)
-    print("torch.version.cuda:", torch.version.cuda)
-    print("torch.cuda.get_device_name(0):", torch.cuda.get_device_name(0))
-    print("nvidia-smi:", os.popen('nvidia-smi').read())
     root_dir = 'static'
     os.makedirs(root_dir, exist_ok=True)
     main()

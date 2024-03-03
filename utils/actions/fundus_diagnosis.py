@@ -36,7 +36,7 @@ class FundusDiagnosis(BaseAction):
               * msg (str): 工具调用是否成功的说明
               * glaucoma (int): 1代表可疑青光眼，0代表非青光眼
               * dr_level (int): 糖尿病视网膜病变的等级，0代表健康，4代表患病程度最严重
-                                0 为健康
+                                0 为非糖尿病视网膜病变
                                 1 代表轻度非增生性的糖尿病视网膜病变
                                 2 中度
                                 3 重度

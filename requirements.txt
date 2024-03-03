@@ -1,7 +1,5 @@
 pandas
 python-docx
-# torch
-# torchvision
 modelscope
 transformers
 xtuner[all]
@@ -10,3 +8,7 @@ streamlit
 lagent==0.2.2
 onnxruntime-gpu
 openxlab
+# torch==2.0.0+cu118
+# torchvision==0.15.1+cu118
+# torchaudio
+# --index-url https://download.pytorch.org/whl/cu118

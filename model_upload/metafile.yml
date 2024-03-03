@@ -1,0 +1,76 @@
+Collections:
+- Name: "OculiChatDA"
+  License: "Apache-2.0"
+  Framework: "[]"
+  Paper: {}
+  Code:
+    URL: "https://github.com/JieGenius/OculiChatDA"
+Models:
+- Name: "config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "configuration_internlm.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "generation_config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "modeling_internlm2.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00001-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00002-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00003-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00004-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00005-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00006-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00007-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00008-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "special_tokens_map.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "tokenization_internlm.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "tokenizer_config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "tokenizer.model"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model.bin.index.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
