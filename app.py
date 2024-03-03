@@ -1,12 +1,13 @@
 import os
 import time
 
-os.system("pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118")
+# os.system("pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118")
 
 MODEL_DIR = "models/"
 MODEL_REPOSITORY_OPENXLAB = "OpenLMLab/internlm2-chat-7b"
 
 if __name__ == '__main__':
+    print("ls /usr/local")
     if not os.path.exists(MODEL_DIR):
         from openxlab.model import download
 
