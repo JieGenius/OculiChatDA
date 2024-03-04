@@ -1,9 +1,11 @@
 import os
 import time
 
-os.system("pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 "
-          "--index-url https://download.pytorch.org/whl/cu118")
+# os.system("pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 "
+#           "--index-url https://download.pytorch.org/whl/cu118")
 
+# issue: https://github.com/InternLM/lmdeploy/issues/1169
+os.system('pip install torch==2.0.0 torchvision==0.15.1')
 MODEL_DIR = 'models/'
 MODEL_REPOSITORY_OPENXLAB = 'flyer/OculiChatDA'
 

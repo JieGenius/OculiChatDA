@@ -7,7 +7,8 @@ from lagent.actions import ActionExecutor
 from lagent.agents.base_agent import BaseAgent
 from lagent.llms import BaseAPIModel, BaseModel
 from lagent.schema import ActionStatusCode  # noqa: E501
-from lagent.schema import ActionReturn, AgentReturn, AgentStatusCode, ModelStatusCode
+from lagent.schema import AgentStatusCode  # noqa: E501
+from lagent.schema import ActionReturn, AgentReturn, ModelStatusCode
 
 API_PREFIX = (
     "This is the subfunction for tool '{tool_name}', you can use this tool. "
