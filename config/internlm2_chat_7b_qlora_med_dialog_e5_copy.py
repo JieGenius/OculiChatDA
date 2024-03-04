@@ -7,12 +7,10 @@ from mmengine.hooks import (CheckpointHook, DistSamplerSeedHook, IterTimerHook,
 from mmengine.optim import AmpOptimWrapper, CosineAnnealingLR, LinearLR
 from peft import LoraConfig
 from torch.optim import AdamW
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig)
-
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from xtuner.dataset import process_hf_dataset
 from xtuner.dataset.collate_fns import default_collate_fn
-from xtuner.dataset.map_fns import oasst1_map_fn, template_map_fn_factory
+from xtuner.dataset.map_fns import template_map_fn_factory
 from xtuner.engine import DatasetInfoHook, EvaluateChatHook
 from xtuner.model import SupervisedFinetune
 from xtuner.utils import PROMPT_TEMPLATE
@@ -45,7 +43,7 @@ warmup_ratio = 0.03
 evaluation_freq = 500
 SYSTEM = ''
 evaluation_inputs = [
-    '青光眼诊断的三要素是什么？', '糖尿病和糖尿病视网膜病变有什么关系呢', "医生你好，我的视野中心有黑色阴影，这是为什么呢?"
+    '青光眼诊断的三要素是什么？', '糖尿病和糖尿病视网膜病变有什么关系呢', '医生你好，我的视野中心有黑色阴影，这是为什么呢?'
 ]
 
 #######################################################################
@@ -86,7 +84,8 @@ model = dict(
 #######################################################################
 train_dataset = dict(
     type=process_hf_dataset,
-    dataset=dict(type=load_dataset, path="json", data_files=dict(train=data_path)),
+    dataset=dict(
+        type=load_dataset, path='json', data_files=dict(train=data_path)),
     tokenizer=tokenizer,
     max_length=max_length,
     dataset_map_fn=None,

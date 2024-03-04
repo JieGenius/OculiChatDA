@@ -6,7 +6,8 @@ from typing import Dict, List, Optional, Union
 from lagent.actions import ActionExecutor
 from lagent.agents.base_agent import BaseAgent
 from lagent.llms import BaseAPIModel, BaseModel
-from lagent.schema import ActionReturn, ActionStatusCode, AgentReturn, AgentStatusCode, ModelStatusCode  # noqa: E501
+from lagent.schema import ActionStatusCode  # noqa: E501
+from lagent.schema import ActionReturn, AgentReturn, AgentStatusCode, ModelStatusCode
 
 API_PREFIX = (
     "This is the subfunction for tool '{tool_name}', you can use this tool. "
@@ -27,12 +28,14 @@ PLUGIN_CN = ('你可以使用如下工具：'
              '如果你已经获得足够信息，请直接给出答案. 避免不必要的工具调用! '
              '同时注意你可以使用的工具，不要随意捏造！')
 
+
 def is_valid_json(my_str):
     try:
         json.JSONDecoder().raw_decode(my_str)
         return True
     except json.decoder.JSONDecodeError:
         return False
+
 
 class Internlm2Protocol:
 
@@ -163,12 +166,13 @@ class Internlm2Protocol:
               interpreter_executor: ActionExecutor):
         if self.language['begin']:
             message = message.split(self.language['begin'])[-1]
-        if self.tool['name_map']['plugin'] in message or is_valid_json(message):
+        if self.tool['name_map']['plugin'] in message or is_valid_json(
+                message):
             # 有时间插件不会包含 <|action_start|> <|plugin|>等符号，而是直接返回json
             if is_valid_json(message):
-                return None, "", message
+                return None, '', message
 
-            message = message.replace("> <", "><")
+            message = message.replace('> <', '><')
             ret = message.split(
                 f"{self.tool['start_token']}{self.tool['name_map']['plugin']}")
 
@@ -216,7 +220,8 @@ class Internlm2Agent(BaseAgent):
         super().__init__(
             llm=llm, action_executor=plugin_executor, protocol=protocol)
 
-    def chat(self, message: Union[str, Dict], **kwargs) -> AgentReturn:
+    def chat(self, message: Union[str, Dict, List[Dict]],
+             **kwargs) -> AgentReturn:
         if isinstance(message, str):
             message = dict(role='user', content=message)
         if isinstance(message, dict):
@@ -295,7 +300,7 @@ class Internlm2Agent(BaseAgent):
             )
             response = ''
             for model_state, res, _ in self._llm.stream_chat(prompt, **kwargs):
-                model_state: ModelStatusCode
+                # model_state: ModelStatusCode
                 response = res
                 if model_state.value < 0:
                     agent_return.state = getattr(AgentStatusCode,

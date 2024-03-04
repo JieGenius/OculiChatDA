@@ -1,32 +1,37 @@
 import os
-import numpy as np
+
 import cv2
+import numpy as np
 import onnxruntime as ort
-from utils.transform import resized_edge, center_crop
-from streamlit.logger import get_logger
 from lagent.actions.base_action import BaseAction, tool_api
+from streamlit.logger import get_logger
+
+from utils.transform import center_crop, resized_edge
 
 logger = get_logger(__name__)
 
 
 class FundusDiagnosis(BaseAction):
-    def __init__(self,
-                 model_path=None,
-                 description: str = None,
-                 enable: bool = True) -> None:
+
+    def __init__(self, model_path=None, enable: bool = True) -> None:
         super().__init__(description=None, enable=enable)
 
         if model_path is not None:
-            assert os.path.exists(model_path), f"model_path: {model_path} not exists"
-            assert model_path[-5:] == ".onnx", f"model_path: {model_path} is not a onnx model"
+            assert os.path.exists(
+                model_path), f'model_path: {model_path} not exists'
+            assert model_path[-5:] == '.onnx', \
+                f'model_path: {model_path} is not a onnx model'
             self.model_path = model_path
             providers = ['CUDAExecutionProvider']
 
-            self.model = ort.InferenceSession(model_path, providers=providers, )
+            self.model = ort.InferenceSession(
+                model_path,
+                providers=providers,
+            )
 
     @tool_api(explode_return=True)
     def fundus_diagnosis(self, fundus_path: str) -> dict:
-        """运行眼底疾病诊断，可实现青光眼二分类和糖尿病视网膜病变5分级
+        """运行眼底疾病诊断，可实现青光眼二分类和糖尿病视网膜病变5分级.
 
         Args:
             fundus_path (str): 眼底图像的路径
@@ -41,14 +46,11 @@ class FundusDiagnosis(BaseAction):
                                 2 中度
                                 3 重度
                                 4 增生性糖尿病视网膜病变
-
         """
         image_path = fundus_path
-        logger.info("查询是: " + fundus_path)
+        logger.info('查询是: ' + fundus_path)
         if not os.path.exists(image_path):
-            return {
-                "msg": "由于图片路径错误，该工具运行失败"
-            }
+            return {'msg': '由于图片路径错误，该工具运行失败'}
         img = cv2.imread(image_path)
 
         img = resized_edge(img, 448, edge='long')
@@ -65,4 +67,4 @@ class FundusDiagnosis(BaseAction):
 
         glaucoma = output[0][0].argmax()
         dr = output[1][0].argmax()
-        return dict(glaucoma=int(glaucoma), dr_level=int(dr), msg="运行成功")
+        return dict(glaucoma=int(glaucoma), dr_level=int(dr), msg='运行成功')

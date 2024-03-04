@@ -1,6 +1,8 @@
 # OculiChatDA 眼科问诊大模型
+
 <!-- PROJECT SHIELDS -->
-<!-- 
+
+<!--
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Issues][issues-shield]][issues-url]
@@ -26,18 +28,21 @@
 </p>
 
 🎉更新
-- 【2024/02] Lagent版本支持0.2.2
-- 
+
+- 【2024/02\] Lagent版本支持0.2.2
+-
+
 ## 简介
 
 </br>
 
 **OculiChatDA** 是一个眼科问诊的大模型，用户可以对眼睛相关的疾病进行问诊，获取专业的医学建议。同时模型拥有读图的能力，可通过眼底图判断是否为**青光眼或糖尿病视网膜病变**患者。
-OculiChatDA的问诊数据集包含了眼科问诊的常见问题，可以进行多轮对话，支持多种对话场景，包括问诊、咨询、闲聊等。 
+OculiChatDA的问诊数据集包含了眼科问诊的常见问题，可以进行多轮对话，支持多种对话场景，包括问诊、咨询、闲聊等。
 
 开源不易，如果本项目帮到大家，可以右上角帮我点个 star~ ⭐⭐ , 您的 star ⭐是我们最大的鼓励，谢谢各位！
 
 ## 介绍
+
 据估算，中国的医生和患者比例仅为西方国家的1/6。尽管国家在医疗卫生事业投入不断增加，医院数量和规模也大幅提升，但医生数量和质量仍然存在瓶颈。与此同时，城乡医疗资源的不均衡分布给农村和偏远地区的居民带来了极大的就医不便。
 
 本项目基于以上现状，设计了一款低成本，先进的对话问诊系统，通过对话的方式，帮助患者迅速进行初步的诊断，并且给出合理的建议，同时，该模型已经初步具有“望闻问切”的一半能力，即**望**和**问**。这一低成本、高效率的解决方案致力于填补医疗资源不足的空缺，为更多患者提供及时、便捷的医疗服务。
@@ -47,11 +52,13 @@ OculiChatDA的问诊数据集包含了眼科问诊的常见问题，可以进行
 Demo访问地址: [OculiChatDA](https://openxlab.org.cn/apps/detail/helloworld/OculiChatDA)
 
 ## 模型
-| 模型                  | 基座                | 数据量               | OpenXLab                                                                             
+
+| 模型                  | 基座                | 数据量               | OpenXLab
 |---------------------|-------------------|-------------------|----------------------------------------------------------------------------------------|
 | OculiChatDA-chat-7b | InternLM2-chat-7b | 500K个对话，对话轮次为1～64 | [![Open in OpenXLab](https://cdn-static.openxlab.org.cn/header/openxlab_models.svg)](https://openxlab.org.cn/models/detail/flyer/OculiChatDA) |
 
 ## 环境安装
+
 ```bash
 conda create -n OculiChatDA python=3.10 # 不建议安装3.11以及以上版本, xtuner最新版只支持3.8~3.10
 conda activate OculiChatDA
@@ -59,6 +66,7 @@ pip install -r requirements.txt
 ```
 
 ## 数据集
+
 ### 问诊数据集
 
 1. 眼科专业书籍
@@ -67,11 +75,12 @@ pip install -r requirements.txt
 4. [MedDialog数据集](https://github.com/UCSD-AI4H/Medical-Dialogue-System)
 
 样例如下:
+
 ```json
 {
   "conversation": [
     {
-      "system": "你是一名眼科专家，你需要解答患者的疑问，提供准确的回答，必要时，提醒患>者及时挂号就医。\n当患者对症状描述不清时，你需要循序渐进的引导患者，询问患者的症状，以便给出准确的诊断。\n当患者上传眼底图时，你需调用Agent判断眼底图中是否存在青光眼和糖尿病视网膜病变，若存在，需>要提醒患者及时就医。\n",
+      "system": "你是一名眼科专家，你需要解答患者的疑问，提供准确的回答，必要时，提醒患者及时挂号就医。\n当患者对症状描述不清时，你需要循序渐进的引导患者，询问患者的症状，以便给出准确的诊断。\n当患者上传眼底图时，你需调用Agent判断眼底图中是否存在青光眼和糖尿病视网膜病变，若存在，需要提醒患者及时就医。\n",
       "input": "什么是单纯疤疹病毒性角膜炎？",
       "output": "单纯疤疹病毒性角膜炎是由单纯疤疹病毒（HSV）引起的角膜感染，是一种常见的眼部疾病，也是致盲性角膜病的主要原因之一。它的特点是反复发作，多次发作会导致角膜逐渐混浊并最终可能导致失明。"
     }
@@ -79,7 +88,9 @@ pip install -r requirements.txt
 }
 
 ```
+
 ## 微调
+
 ```bash
 mkdir -p /root/OculiChatDA/data
 ln -s /share/model_repos/internlm2-chat-7b /root/OculiChatDA/data
@@ -98,11 +109,12 @@ vim internlm2_chat_7b_qlora_med_dialog_e5.py # 修改配置文件
 ---> dataset=dict(type=load_dataset, path="json", data_files=dict(train=data_path)),
 ---> dataset_map_fn = None
 
-xtuner train config/internlm2_chat_7b_qlora_med_dialog_e5_copy.py --deepspeed deepspeed_zero2 
+xtuner train config/internlm2_chat_7b_qlora_med_dialog_e5_copy.py --deepspeed deepspeed_zero2
 # 实测batch为4耗显存26G，需要开一个2 * 1/4的机器
 ```
 
 ## 初步性能测试
+
 ```bash
 xtuner convert pth_to_hf config/internlm2_chat_7b_qlora_med_dialog_e3_copy.py work_dirs/internlm2_chat_7b_qlora_med_dialog_e3_copy/epoch_1.pth  ./hf
 xtuner convert merge ./data/internlm2-chat-7b ./hf ./merged --max-shard-size 2GB
@@ -111,50 +123,58 @@ xtuner chat ./merged --prompt-template internlm2_chat
 ```
 
 ## Agent调用能力
+
 输入:
 
-    #############################################
-    你是一个可以调用外部工具的助手，可以使用的工具包括：
-    {'FundusDiagnosis': '一个眼底图像诊断的工具，\n可以诊断眼底图像中的病变类型，如青光眼、是否为糖尿病视网膜病变。\n输入为眼底图的图像路径，可以为本地地址，也可以为网络地址(链接)\n'}
-    如果使用工具请遵循以下格式回复：
-    ``` 
-    Thought:思考你当前步骤需要解决什么问题，是否需要使用工具
-    Action:工具名称，你的工具必须从 [['FundusDiagnosis']] 选择
-    Action Input:工具输入参数
-    ```
-    工具返回按照以下格式回复：
-    ```
-    Response:调用工具后的结果
-    ```
-    如果你已经知道了答案，或者你不需要工具，请遵循以下格式回复
-    ```
-    Thought:给出最终答案的思考过程
-    Final Answer:最终答案
-    ```
-    开始
+````
+#############################################
+你是一个可以调用外部工具的助手，可以使用的工具包括：
+{'FundusDiagnosis': '一个眼底图像诊断的工具，\n可以诊断眼底图像中的病变类型，如青光眼、是否为糖尿病视网膜病变。\n输入为眼底图的图像路径，可以为本地地址，也可以为网络地址(链接)\n'}
+如果使用工具请遵循以下格式回复：
+```
+Thought:思考你当前步骤需要解决什么问题，是否需要使用工具
+Action:工具名称，你的工具必须从 [['FundusDiagnosis']] 选择
+Action Input:工具输入参数
+```
+工具返回按照以下格式回复：
+```
+Response:调用工具后的结果
+```
+如果你已经知道了答案，或者你不需要工具，请遵循以下格式回复
+```
+Thought:给出最终答案的思考过程
+Final Answer:最终答案
+```
+开始
+````
 
 继续输入:
 
-    我上传了一张图片，图片路径为/a/b/c.jpg q请判断我是否患有青光眼
+```
+我上传了一张图片，图片路径为/a/b/c.jpg q请判断我是否患有青光眼
+```
 
 模型输出:
 
-    Thought: 你好！根据你的描述，你上传了一张眼底图像，需要判断是否患有青光眼。请问你的眼底图像是什么类型的？是彩色还是黑白？是数码的还是胶片的？另外，你的眼底图像是否有病变？如果有病变，是什么类型的？请提供更多的信息，以便我更好地帮助你。
-    Action: FundusDiagnosis
-    Action Input: {"image_path": "/a/b/c.jpg"}<|im_end|>
+```
+Thought: 你好！根据你的描述，你上传了一张眼底图像，需要判断是否患有青光眼。请问你的眼底图像是什么类型的？是彩色还是黑白？是数码的还是胶片的？另外，你的眼底图像是否有病变？如果有病变，是什么类型的？请提供更多的信息，以便我更好地帮助你。
+Action: FundusDiagnosis
+Action Input: {"image_path": "/a/b/c.jpg"}<|im_end|>
+```
 
 由此可确定微调后的模型没有遗忘Agent调用的能力。
 
 ## 模型能力测试:
 
-
 ## lmdeploy部署
+
 ```bash
 lmdeploy convert internlm2-chat-7b  ./merged
 lmdeploy serve api_server ./workspace --server-name 0.0.0.0 --server-port 23333 --tp 1
 ```
 
 ## 模型上传
+
 ```bash
 python model_upload/convert.py
 openxlab login
@@ -162,13 +182,16 @@ cd merged
 openxlab model create --model-repo='flyer/OculiChatDA' -s ./metafile.yml
 
 ```
+
 ## Web Demo
+
 ```bash
 streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True
 ```
 
 ## TODO
-- [ ] 语音问诊
-- [ ] 视频问诊，数字人接入。 
-- [ ] 问诊数据集扩充，增加更多真实的问诊数据
-- [ ] Agent能力扩充，识别更多的眼病（如中心性浆液，病理性近视，视网膜脱离等），更多的模态（如OCT，裂隙灯，眼表照相等），
+
+- \[ \] 语音问诊
+- \[ \] 视频问诊，数字人接入。
+- \[ \] 问诊数据集扩充，增加更多真实的问诊数据
+- \[ \] Agent能力扩充，识别更多的眼病（如中心性浆液，病理性近视，视网膜脱离等），更多的模态（如OCT，裂隙灯，眼表照相等），

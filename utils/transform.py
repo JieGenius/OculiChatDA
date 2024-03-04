@@ -53,6 +53,7 @@ def resized_edge(img, scale, edge='short', interpolation='bicubic'):
 
     return img
 
+
 def center_crop(img, crop_size):
     """Crop the center of image.
 

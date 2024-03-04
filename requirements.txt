@@ -1,13 +1,13 @@
-pandas
-python-docx
-modelscope
-transformers
-xtuner[all]
-lmdeploy[all]==0.2.4
-streamlit
 lagent==0.2.2
+lmdeploy[all]==0.2.4
+modelscope
 onnxruntime-gpu
 openxlab
+pandas
+python-docx
+streamlit
+transformers
+xtuner[all]
 # torch==2.0.0+cu118
 # torchvision==0.15.1+cu118
 # torchaudio

@@ -3,30 +3,32 @@ import hashlib
 import json
 import os
 import re
-import torch
-import streamlit as st
 
+import streamlit as st
 from lagent.actions import ActionExecutor
-# from lagent.agents.internlm2_agent import Internlm2Protocol
-from utils.internlm2_agent import Internlm2Agent, Internlm2Protocol
 from lagent.llms.lmdepoly_wrapper import LMDeployClient
 from lagent.llms.meta_template import INTERNLM2_META as META
 from lagent.schema import AgentStatusCode
-from utils.actions.fundus_diagnosis import FundusDiagnosis
-import base64
-# from streamlit.logger import get_logger
-LMDEPLOY_IP = "0.0.0.0:23333"
-MODEL_NAME = "internlm2-chat-7b"
 
-OculiChatDA_META_CN = ("你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。\n"
-                       "你的工作单位为**某三家医院**\n"
-                       "你有以下三种能力:\n"
-                       "1. 诊断眼底疾病，包括青光眼和糖尿病视网膜病变\n"
-                       "2. 眼科常见疾病诊断，疾病解答，疾病预防等\n"
-                       "3. 眼科药品信息查询\n" 
-                       "你可以主动询问用户基本信息，比如年龄，用眼频率，用眼环境等等，请时刻保持耐心且细致的回答"
-                       "你可以调用外部工具来帮助帮助用户解决问题")
-OculiChatDA_META_CN = OculiChatDA_META_CN  # + "\n".join(ReActCALL_PROTOCOL_CN.split("\n")[1:])
+from utils.actions.fundus_diagnosis import FundusDiagnosis
+# from lagent.agents.internlm2_agent import Internlm2Protocol
+from utils.internlm2_agent import Internlm2Agent, Internlm2Protocol
+
+# from streamlit.logger import get_logger
+LMDEPLOY_IP = '0.0.0.0:23333'
+MODEL_NAME = 'internlm2-chat-7b'
+
+OculiChatDA_META_CN = ('你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。\n'
+                       '你的工作单位为**某三家医院**\n'
+                       '你有以下三种能力:\n'
+                       '1. 诊断眼底疾病，包括青光眼和糖尿病视网膜病变\n'
+                       '2. 眼科常见疾病诊断，疾病解答，疾病预防等\n'
+                       '3. 眼科药品信息查询\n'
+                       '你可以主动询问用户基本信息，比如年龄，用眼频率，用眼环境等等，'
+                       '请时刻保持耐心且细致的回答\n'
+                       '你可以调用外部工具来帮助帮助用户解决问题')
+OculiChatDA_META_CN = OculiChatDA_META_CN
+# + "\n".join(ReActCALL_PROTOCOL_CN.split("\n")[1:])
 PLUGIN_CN = """你可以使用如下工具：
 {prompt}
 **如果你已经获得足够信息，请直接给出答案. 避免重复或不必要的工具调用!**
@@ -43,7 +45,7 @@ PLUGIN_CN = """你可以使用如下工具：
 同时注意你可以使用的工具，不要随意捏造！
 """
 
-FUNDUS_DIAGNOSIS_MODEL_PATH = "glaucoma_cls_dr_grading"
+FUNDUS_DIAGNOSIS_MODEL_PATH = 'glaucoma_cls_dr_grading'
 
 
 class SessionState:
@@ -53,10 +55,13 @@ class SessionState:
         st.session_state['assistant'] = []
         st.session_state['user'] = []
 
-        model_path = os.path.join(FUNDUS_DIAGNOSIS_MODEL_PATH, "flyer123/GlauClsDRGrading", "model.onnx")
+        model_path = os.path.join(FUNDUS_DIAGNOSIS_MODEL_PATH,
+                                  'flyer123/GlauClsDRGrading', 'model.onnx')
         if not os.path.exists(model_path):
             from modelscope import snapshot_download
-            snapshot_download("flyer123/GlauClsDRGrading", cache_dir=FUNDUS_DIAGNOSIS_MODEL_PATH)
+            snapshot_download(
+                'flyer123/GlauClsDRGrading',
+                cache_dir=FUNDUS_DIAGNOSIS_MODEL_PATH)
 
         action_list = [
             FundusDiagnosis(model_path=model_path),
@@ -101,7 +106,7 @@ class StreamlitUI:
         """Setup the sidebar for model and plugin selection."""
 
         if MODEL_NAME != st.session_state[
-            'model_selected'] or st.session_state['ip'] != LMDEPLOY_IP:
+                'model_selected'] or st.session_state['ip'] != LMDEPLOY_IP:
             st.session_state['ip'] = LMDEPLOY_IP
             model = self.init_model(MODEL_NAME, LMDEPLOY_IP)
             self.session_state.clear_state()
@@ -121,14 +126,17 @@ class StreamlitUI:
                 st.session_state['chatbot']._action_executor = None
             st.session_state['chatbot']._interpreter_executor = None
 
-        st.sidebar.header("自我揭秘")
-        st.sidebar.markdown("我是您的眼科问诊机器人，你可以问我所有的眼科疾病和眼科药品信息。"
-                            "如果有需要的话，我可以通过识别眼底图来帮助诊断 **青光眼** 和 **糖尿病视网膜病变** 。")
+        st.sidebar.header('自我揭秘')
+        st.sidebar.markdown('我是您的眼科问诊机器人，你可以问我所有的眼科疾病和眼科药品信息。'
+                            '如果有需要的话，我可以通过识别眼底图来帮助诊断 **青光眼** 和 **糖尿病视网膜病变** 。')
         if st.sidebar.button('清空对话', key='clear'):
             self.session_state.clear_state()
         uploaded_file = st.sidebar.file_uploader('上传文件')
-        st.sidebar.download_button(label="下载眼底图测试用例", data=open("assets/test_case.zip", "rb").read(),
-                                   file_name="test_case.zip", mime="application/zip")
+        st.sidebar.download_button(
+            label='下载眼底图测试用例',
+            data=open('assets/test_case.zip', 'rb').read(),
+            file_name='test_case.zip',
+            mime='application/zip')
         return MODEL_NAME, model, plugin_action, uploaded_file, LMDEPLOY_IP
 
     def init_model(self, model_name, ip=None):
@@ -161,26 +169,28 @@ class StreamlitUI:
                         plugin='<|plugin|>', interpreter='<|interpreter|>'),
                     belong='assistant',
                     end='<|action_end|>\n',
-                ), ),
-
-            # protocol=ReActProtocol(call_protocol=OculiChatDA_META_CN, force_stop=ReActFORCE_STOP_PROMPT_CN)
+                ),
+            ),
         )
 
     def render_user(self, prompt: str):
         with st.chat_message('user'):
-            img_paths = re.findall(r'\!\[.*?\]\((.*?)\)', prompt, re.DOTALL)  # 允许皮配\n等空字符
+            img_paths = re.findall(r'\!\[.*?\]\((.*?)\)', prompt,
+                                   re.DOTALL)  # 允许皮配\n等空字符
             if len(img_paths):
-                st.markdown(re.sub(r'!\[.*\]\(.*\)', '', prompt.replace("\\n", " \\n ")))  # 先渲染非图片部分
+                st.markdown(
+                    re.sub(r'!\[.*\]\(.*\)', '',
+                           prompt.replace('\\n', ' \\n ')))  # 先渲染非图片部分
                 # 再渲染图片
                 img_path = img_paths[0]
                 st.write(
                     f'<img src="app/{img_path}" style="width: 40%;">',
-                    unsafe_allow_html=True
-                )
+                    unsafe_allow_html=True)
                 # if os.path.exists(img_path):
-                #     st.image(open(img_path, 'rb').read(), caption='Uploaded Image', width=400)
+                #     st.image(open(img_path, 'rb').read(),
+                #              caption='Uploaded Image', width=400)
             else:
-                st.markdown(prompt.replace("\\n", " \\n "))
+                st.markdown(prompt.replace('\\n', ' \\n '))
 
     def render_assistant(self, agent_return):
         with st.chat_message('assistant'):
@@ -268,7 +278,7 @@ def main():
     # Initialize chatbot if it is not already initialized
     # or if the model has changed
     if 'chatbot' not in st.session_state or model != st.session_state[
-        'chatbot']._llm:
+            'chatbot']._llm:
         st.session_state['chatbot'] = st.session_state[
             'ui'].initialize_chatbot(model, plugin_action)
         st.session_state['session_history'] = []
@@ -283,7 +293,8 @@ def main():
             st.session_state['ui'].render_user(user_input)
         st.session_state['user'].append(user_input)
         # Add file uploader to sidebar
-        if (uploaded_file and uploaded_file.name not in st.session_state['file']):
+        if (uploaded_file
+                and uploaded_file.name not in st.session_state['file']):
 
             st.session_state['file'].add(uploaded_file.name)
             file_bytes = uploaded_file.read()
@@ -313,7 +324,8 @@ def main():
                     content=json.dumps(dict(path=file_path, size=file_size)),
                     name='眼底图')
             ]
-            st.session_state['user'][-1] = st.session_state['user'][-1] + f"\n ![眼底图图像路径]({file_path})"
+            st.session_state['user'][-1] = st.session_state['user'][
+                -1] + f'\n ![眼底图图像路径]({file_path})'
         if isinstance(user_input, str):
             user_input = [dict(role='user', content=user_input)]
         st.session_state['last_status'] = AgentStatusCode.SESSION_READY
@@ -342,7 +354,7 @@ def main():
                         action = f"\n\n {agent_return.response['name']}: \n\n"
                         action_input = agent_return.response['parameters']
                         if agent_return.response[
-                            'name'] == 'IPythonInterpreter':
+                                'name'] == 'IPythonInterpreter':
                             action_input = action_input['command']
                         response = action + action_input
                     else:
@@ -352,7 +364,7 @@ def main():
                         st.session_state['temp'])
             elif agent_return.state == AgentStatusCode.END:
                 st.session_state['session_history'] += (
-                        user_input + agent_return.inner_steps)
+                    user_input + agent_return.inner_steps)
                 agent_return = copy.deepcopy(agent_return)
                 agent_return.response = st.session_state['temp']
                 st.session_state['assistant'].append(
