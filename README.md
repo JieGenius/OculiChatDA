@@ -49,8 +49,10 @@ OculiChatDA的问诊数据集包含了眼科问诊的常见问题，可以进行
 
 ## 演示
 
-Demo访问地址: [OculiChatDA](https://openxlab.org.cn/apps/detail/flyer/oculi_chat_diagnosis_assistant)
+**Demo访问地址:** [OculiChatDA](https://openxlab.org.cn/apps/detail/flyer/oculi_chat_diagnosis_assistant)
 
+**效果展示:**
+![宣传图](assets/publicity.png)
 ## 模型
 
 | 模型                  | 基座                | 数据量               | OpenXLab
