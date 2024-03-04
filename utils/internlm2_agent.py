@@ -171,7 +171,7 @@ class Internlm2Protocol:
                 message):
             # 有时间插件不会包含 <|action_start|> <|plugin|>等符号，而是直接返回json
             if is_valid_json(message):
-                return None, '', message
+                return 'plugin', '', message
 
             message = message.replace('> <', '><')
             ret = message.split(
@@ -220,6 +220,7 @@ class Internlm2Agent(BaseAgent):
         self._interpreter_executor = interpreter_executor
         super().__init__(
             llm=llm, action_executor=plugin_executor, protocol=protocol)
+        self.agent_call_id = set() # 确保一个message不会多次调用同一plugin，仅为临时补丁
 
     def chat(self, message: Union[str, Dict, List[Dict]],
              **kwargs) -> AgentReturn:
@@ -324,11 +325,22 @@ class Internlm2Agent(BaseAgent):
                                     logging.info(
                                         msg='No plugin is instantiated!')
                                     continue
+                                # 由于llm的agent解析能力有限，这里需要临时补丁
+                                if id(message) not in self.agent_call_id:
+                                    self.agent_call_id.add(id(message))
+                                else:
+                                    print("启动临时补丁，防止多次调用同一plugin")
+                                    name = None
+                                    break #
+                                # -----
                                 try:
                                     action = json.loads(action)
                                 except Exception as e:
                                     logging.info(msg=f'Invaild action {e}')
                                     continue
+                                if  action["parameters"]["fundus_path"] == "path/to/your/fundus/image":
+                                    print("启动临时补丁，当用户未上传眼底图时，禁止调用插件")
+                                    name = None
                             elif name == 'interpreter':
                                 if self._interpreter_executor:
                                     executor = self._interpreter_executor

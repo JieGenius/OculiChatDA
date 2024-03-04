@@ -22,10 +22,9 @@ OculiChatDA_META_CN = ("你是一名眼科专家，可以通过文字和图片�
                        "你有以下三种能力:\n"
                        "1. 诊断眼底疾病，包括青光眼和糖尿病视网膜病变\n"
                        "2. 眼科常见疾病诊断，疾病解答，疾病预防等\n"
-                       "3. 眼科药品信息查询\n" 
-                       "你可以主动询问用户基本信息，比如年龄，用眼频率，用眼环境等等"
+                       "3. 眼科药品信息查询\n"
                        "你的工作单位为**某三甲医院**\n"
-                       "你可以调用外部工具来帮助帮助用户解决问题")
+                       "你可以调用外部工具来帮助用户解决问题，如果工具调用显示用户眼睛存在问题，你需要为用户解释该病的病因，早期和晚期的症状，以及可能的治疗方案，同时提醒用户，这仅仅为初步诊断结果，需要用户到医院做进一步的检查")
 OculiChatDA_META_CN = OculiChatDA_META_CN  # + "\n".join(ReActCALL_PROTOCOL_CN.split("\n")[1:])
 PLUGIN_CN = """你可以使用如下工具：
 {prompt}
@@ -104,7 +103,7 @@ class StreamlitUI:
         """Setup the sidebar for model and plugin selection."""
 
         if MODEL_NAME != st.session_state[
-                'model_selected'] or st.session_state['ip'] != LMDEPLOY_IP:
+            'model_selected'] or st.session_state['ip'] != LMDEPLOY_IP:
             st.session_state['ip'] = LMDEPLOY_IP
             model = self.init_model(MODEL_NAME, LMDEPLOY_IP)
             self.session_state.clear_state()
@@ -169,16 +168,17 @@ class StreamlitUI:
                     end='<|action_end|>\n',
                 ),
             ),
+            max_turn=2,
         )
 
     def render_user(self, prompt: str):
-        with st.chat_message('user'):
+        with st.chat_message('user', avatar="👦"):
             img_paths = re.findall(r'\!\[.*?\]\((.*?)\)', prompt,
                                    re.DOTALL)  # 允许皮配\n等空字符
             if len(img_paths):
                 st.markdown(
                     re.sub(r'!\[.*\]\(.*\)', '',
-                           prompt.replace('\\n', ' \\n ')))  # 先渲染非图片部分
+                           prompt))  # 先渲染非图片部分
                 # 再渲染图片
                 img_path = img_paths[0]
                 st.write(
@@ -188,14 +188,14 @@ class StreamlitUI:
                 #     st.image(open(img_path, 'rb').read(),
                 #              caption='Uploaded Image', width=400)
             else:
-                st.markdown(prompt.replace('\\n', ' \\n '))
+                st.markdown(prompt)
 
     def render_assistant(self, agent_return):
-        with st.chat_message('assistant'):
+        with st.chat_message('assistant', avatar="👨‍⚕️"):
             for action in agent_return.actions:
                 if (action) and (action.type != 'FinishAction'):
                     self.render_action(action)
-            st.markdown(agent_return.response)
+            st.markdown(agent_return.response.replace('\\n', ' \\n '))
 
     def render_plugin_args(self, action):
         action_name = action.type
@@ -276,7 +276,7 @@ def main():
     # Initialize chatbot if it is not already initialized
     # or if the model has changed
     if 'chatbot' not in st.session_state or model != st.session_state[
-            'chatbot']._llm:
+        'chatbot']._llm:
         st.session_state['chatbot'] = st.session_state[
             'ui'].initialize_chatbot(model, plugin_action)
         st.session_state['session_history'] = []
@@ -323,7 +323,7 @@ def main():
                     name='眼底图')
             ]
             st.session_state['user'][-1] = st.session_state['user'][
-                -1] + f'\n ![眼底图图像路径]({file_path})'
+                                               -1] + f'\n ![眼底图图像路径]({file_path})'
         if isinstance(user_input, str):
             user_input = [dict(role='user', content=user_input)]
         st.session_state['last_status'] = AgentStatusCode.SESSION_READY
@@ -352,7 +352,7 @@ def main():
                         action = f"\n\n {agent_return.response['name']}: \n\n"
                         action_input = agent_return.response['parameters']
                         if agent_return.response[
-                                'name'] == 'IPythonInterpreter':
+                            'name'] == 'IPythonInterpreter':
                             action_input = action_input['command']
                         response = action + action_input
                     else:
@@ -362,7 +362,7 @@ def main():
                         st.session_state['temp'])
             elif agent_return.state == AgentStatusCode.END:
                 st.session_state['session_history'] += (
-                    user_input + agent_return.inner_steps)
+                        user_input + agent_return.inner_steps)
                 agent_return = copy.deepcopy(agent_return)
                 agent_return.response = st.session_state['temp']
                 st.session_state['assistant'].append(
