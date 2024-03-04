@@ -1,8 +1,6 @@
 import os
 import time
 
-import torch
-
 os.system("pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 "
           "--index-url https://download.pytorch.org/whl/cu118")
 
@@ -20,7 +18,7 @@ if __name__ == '__main__':
         print('解压后目录结果如下：')
         print(os.listdir(MODEL_DIR))
         os.system(f'lmdeploy convert internlm2-chat-7b {MODEL_DIR}')
-
+    import torch
     print('torch.cuda.is_available():', torch.cuda.is_available())
     print('torch.__version__:', torch.__version__)
     print('torch.version.cuda:', torch.version.cuda)
