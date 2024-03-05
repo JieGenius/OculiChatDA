@@ -176,6 +176,21 @@ lmdeploy convert internlm2-chat-7b  ./merged
 lmdeploy serve api_server ./workspace --server-name 0.0.0.0 --server-port 23333 --tp 1
 ```
 
+## 工具调用能力加强
+
+```bash
+# 使用最新的模型开始微调
+xtuner copy-cfg internlm2_7b_qlora_msagent_react_e3_gpu8 config
+cd config
+mv internlm2_7b_qlora_msagent_react_e3_gpu8_copy.py internlm2_7b_qlora_msagent_react_e1.py
+vim internlm2_7b_qlora_msagent_react_e1.py
+>>> pretrained_model_name_or_path = './merged'
+>>> lr = 2e-5
+>>> max_epochs = 1
+
+xtuner train config/internlm2_7b_qlora_msagent_react_e1.py --deepspeed deepspeed_zero2
+```
+
 ## 模型上传
 
 ```bash

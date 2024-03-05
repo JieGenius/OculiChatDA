@@ -7,7 +7,8 @@ import time
 # issue: https://github.com/InternLM/lmdeploy/issues/1169
 os.system('pip install torch==2.0.0 torchvision==0.15.1')
 MODEL_DIR = 'models/'
-MODEL_REPOSITORY_OPENXLAB = 'flyer/OculiChatDA'
+# MODEL_REPOSITORY_OPENXLAB = 'flyer/OculiChatDA'
+MODEL_REPOSITORY_OPENXLAB = 'OpenLMLab/internlm2-chat-7b'
 
 if __name__ == '__main__':
     print('服务器cuda版本检测：')
