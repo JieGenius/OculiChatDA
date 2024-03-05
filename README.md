@@ -53,6 +53,7 @@ OculiChatDA的问诊数据集包含了眼科问诊的常见问题，可以进行
 
 **效果展示:**
 ![宣传图](assets/publicity.png)
+
 ## 模型
 
 | 模型                  | 基座                | 数据量               | OpenXLab
@@ -190,6 +191,10 @@ openxlab model create --model-repo='flyer/OculiChatDA' -s ./metafile.yml
 ```bash
 streamlit run web_demo.py --server.address=0.0.0.0 --server.port 7860 --server.enableStaticServing True
 ```
+
+## 青光眼分类和糖尿病视网膜病变分级模型
+
+详见： [https://github.com/JieGenius/OculiChatDA/blob/main/utils/actions/fundus_diagnosis.py](https://github.com/JieGenius/OculiChatDA/blob/main/utils/actions/fundus_diagnosis.py)
 
 ## TODO
 
