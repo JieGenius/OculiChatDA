@@ -46,6 +46,8 @@ class FundusDiagnosis(BaseAction):
                                 2 中度
                                 3 重度
                                 4 增生性糖尿病视网膜病变
+              * amd (int): 1代表可疑年龄相关性黄斑变性，0代表非黄斑变性
+              * pm (int): 1代表病理性近视，0代表非病理性近视
         """
         image_path = fundus_path
         logger.info('查询是: ' + fundus_path)
@@ -67,4 +69,11 @@ class FundusDiagnosis(BaseAction):
 
         glaucoma = output[0][0].argmax()
         dr = output[1][0].argmax()
-        return dict(glaucoma=int(glaucoma), dr_level=int(dr), msg='运行成功')
+        amd = output[2][0].argmax()
+        pm = output[3][0].argmax()
+        return dict(
+            glaucoma=int(glaucoma),
+            dr_level=int(dr),
+            amd=int(amd),
+            pm=int(pm),
+            msg='运行成功')
