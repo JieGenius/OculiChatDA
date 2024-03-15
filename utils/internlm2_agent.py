@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from copy import deepcopy
 from typing import Dict, List, Optional, Union
 
@@ -220,7 +221,7 @@ class Internlm2Agent(BaseAgent):
         self._interpreter_executor = interpreter_executor
         super().__init__(
             llm=llm, action_executor=plugin_executor, protocol=protocol)
-        self.agent_call_id = set() # 确保一个message不会多次调用同一plugin，仅为临时补丁
+        self.agent_call_id = set()  # 确保一个message不会多次调用同一plugin，仅为临时补丁
 
     def chat(self, message: Union[str, Dict, List[Dict]],
              **kwargs) -> AgentReturn:
@@ -304,6 +305,8 @@ class Internlm2Agent(BaseAgent):
             for model_state, res, _ in self._llm.stream_chat(prompt, **kwargs):
                 # model_state: ModelStatusCode
                 response = res
+                # replace \n\d to \n \d for markdown to render correctly
+                response = re.sub(r'\\n(\d)', r'\n \1', response)
                 if model_state.value < 0:
                     agent_return.state = getattr(AgentStatusCode,
                                                  model_state.name)
@@ -329,17 +332,18 @@ class Internlm2Agent(BaseAgent):
                                 if id(message) not in self.agent_call_id:
                                     self.agent_call_id.add(id(message))
                                 else:
-                                    print("启动临时补丁，防止多次调用同一plugin")
+                                    print('启动临时补丁，防止多次调用同一plugin')
                                     name = None
-                                    break #
+                                    break  #
                                 # -----
                                 try:
                                     action = json.loads(action)
                                 except Exception as e:
                                     logging.info(msg=f'Invaild action {e}')
                                     continue
-                                if  action["parameters"]["fundus_path"] == "path/to/your/fundus/image":
-                                    print("启动临时补丁，当用户未上传眼底图时，禁止调用插件")
+                                if action['parameters'][
+                                        'fundus_path'] == 'path/to/your/fundus/image':
+                                    print('启动临时补丁，当用户未上传眼底图时，禁止调用插件')
                                     name = None
                             elif name == 'interpreter':
                                 if self._interpreter_executor:

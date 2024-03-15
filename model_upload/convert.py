@@ -13,7 +13,7 @@ file_name = 'metafile.yml'
 with open(file_name) as file:
     data = yaml.load(file)
 data['Models'] = []
-for file in os.listdir(MODEL_DIR):  # type: ignore
+for file in sorted(os.listdir(MODEL_DIR)):  # type: ignore
     if file == 'metafile.yml':
         continue
     data['Models'].append({

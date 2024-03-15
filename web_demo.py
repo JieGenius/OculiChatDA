@@ -18,20 +18,24 @@ from utils.internlm2_agent import Internlm2Agent, Internlm2Protocol
 LMDEPLOY_IP = '0.0.0.0:23333'
 MODEL_NAME = 'internlm2-chat-7b'
 
-OculiChatDA_META_CN = ("你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。\n"
-                       "你有以下三种能力:\n"
-                       "1. 诊断眼底疾病，包括青光眼和糖尿病视网膜病变\n"
-                       "2. 眼科常见疾病诊断，疾病解答，疾病预防等\n"
-                       "3. 眼科药品信息查询\n"
-                       "你的工作单位为**某三甲医院**\n"
-                       "你可以调用外部工具来帮助用户解决问题，如果工具调用显示用户眼睛存在问题，你需要为用户解释该病的病因，早期和晚期的症状，以及可能的治疗方案，同时提醒用户，这仅仅为初步诊断结果，需要用户到医院做进一步的检查")
+OculiChatDA_META_CN = (
+    '你是一名眼科专家，可以通过文字和图片来帮助用户诊断眼睛的状态。\n'
+    '你有以下三种能力:\n'
+    '1. 诊断眼底疾病，包括青光眼、糖尿病视网膜病变、年龄相关性黄斑变性和病理性近视\n'
+    '2. 眼科常见疾病诊断，疾病解答，疾病预防等\n'
+    '3. 眼科药品信息查询\n'
+    '你的工作单位为**某三甲医院**\n'
+    '当用户询问自己是否患有**青光眼**,**糖尿病视网膜病变**, **年龄相关性黄斑变性**和**病理性近视时**\n'
+    '且未上传眼底图像时，你可以告诉用户，你可通过工具帮忙诊断，如果用户有拍摄好的眼底图可获取准确的结果，如果用户说没有眼底图，你需要问其有什么症状，根据症状给出初步诊断结果。\n'
+    '如果工具调用显示用户眼睛存在问题，你需要为用户解释该病的病因，早期和晚期的症状，以及可能的治疗方案，同时提醒用户，这仅仅为初步诊断结果，需要用户到医院做进一步的检查'
+)
 OculiChatDA_META_CN = OculiChatDA_META_CN  # + "\n".join(ReActCALL_PROTOCOL_CN.split("\n")[1:])
 PLUGIN_CN = """你可以使用如下工具：
 {prompt}
 **如果你已经获得足够信息，请直接给出答案. 避免重复或不必要的工具调用!**
 如果使用工具请遵循以下格式回复：
 ```
-开始执行工具<|action_start|><|plugin|>
+<|action_start|><|plugin|>
 {{
     name: tool_name,
     parameters: tool_parameters in dict format
@@ -103,7 +107,7 @@ class StreamlitUI:
         """Setup the sidebar for model and plugin selection."""
 
         if MODEL_NAME != st.session_state[
-            'model_selected'] or st.session_state['ip'] != LMDEPLOY_IP:
+                'model_selected'] or st.session_state['ip'] != LMDEPLOY_IP:
             st.session_state['ip'] = LMDEPLOY_IP
             model = self.init_model(MODEL_NAME, LMDEPLOY_IP)
             self.session_state.clear_state()
@@ -124,8 +128,10 @@ class StreamlitUI:
             st.session_state['chatbot']._interpreter_executor = None
 
         st.sidebar.header('自我揭秘')
-        st.sidebar.markdown('我是您的眼科问诊机器人，你可以问我所有的眼科疾病和眼科药品信息。'
-                            '如果有需要的话，我可以通过识别眼底图来帮助诊断 **青光眼** 和 **糖尿病视网膜病变** 。')
+        st.sidebar.markdown(
+            '我是您的眼科问诊机器人，你可以问我所有的眼科疾病和眼科药品信息。'
+            '如果有需要的话，我可以通过识别眼底图来帮助诊断 **青光眼**、 **糖尿病视网膜病变**、**年龄相关性黄斑变性**和**病理性近视** 。'
+        )
         if st.sidebar.button('清空对话', key='clear'):
             self.session_state.clear_state()
         uploaded_file = st.sidebar.file_uploader('上传文件')
@@ -172,13 +178,11 @@ class StreamlitUI:
         )
 
     def render_user(self, prompt: str):
-        with st.chat_message('user', avatar="👦"):
+        with st.chat_message('user', avatar='👦'):
             img_paths = re.findall(r'\!\[.*?\]\((.*?)\)', prompt,
                                    re.DOTALL)  # 允许皮配\n等空字符
             if len(img_paths):
-                st.markdown(
-                    re.sub(r'!\[.*\]\(.*\)', '',
-                           prompt))  # 先渲染非图片部分
+                st.markdown(re.sub(r'!\[.*\]\(.*\)', '', prompt))  # 先渲染非图片部分
                 # 再渲染图片
                 img_path = img_paths[0]
                 st.write(
@@ -191,7 +195,7 @@ class StreamlitUI:
                 st.markdown(prompt)
 
     def render_assistant(self, agent_return):
-        with st.chat_message('assistant', avatar="👨‍⚕️"):
+        with st.chat_message('assistant', avatar='👨‍⚕️'):
             for action in agent_return.actions:
                 if (action) and (action.type != 'FinishAction'):
                     self.render_action(action)
@@ -276,7 +280,7 @@ def main():
     # Initialize chatbot if it is not already initialized
     # or if the model has changed
     if 'chatbot' not in st.session_state or model != st.session_state[
-        'chatbot']._llm:
+            'chatbot']._llm:
         st.session_state['chatbot'] = st.session_state[
             'ui'].initialize_chatbot(model, plugin_action)
         st.session_state['session_history'] = []
@@ -323,7 +327,7 @@ def main():
                     name='眼底图')
             ]
             st.session_state['user'][-1] = st.session_state['user'][
-                                               -1] + f'\n ![眼底图图像路径]({file_path})'
+                -1] + f'\n ![眼底图图像路径]({file_path})'
         if isinstance(user_input, str):
             user_input = [dict(role='user', content=user_input)]
         st.session_state['last_status'] = AgentStatusCode.SESSION_READY
@@ -352,7 +356,7 @@ def main():
                         action = f"\n\n {agent_return.response['name']}: \n\n"
                         action_input = agent_return.response['parameters']
                         if agent_return.response[
-                            'name'] == 'IPythonInterpreter':
+                                'name'] == 'IPythonInterpreter':
                             action_input = action_input['command']
                         response = action + action_input
                     else:
@@ -362,7 +366,7 @@ def main():
                         st.session_state['temp'])
             elif agent_return.state == AgentStatusCode.END:
                 st.session_state['session_history'] += (
-                        user_input + agent_return.inner_steps)
+                    user_input + agent_return.inner_steps)
                 agent_return = copy.deepcopy(agent_return)
                 agent_return.response = st.session_state['temp']
                 st.session_state['assistant'].append(
