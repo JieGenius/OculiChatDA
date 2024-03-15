@@ -7,16 +7,18 @@ import time
 # issue: https://github.com/InternLM/lmdeploy/issues/1169
 os.system('pip install torch==2.0.0 torchvision==0.15.1')
 MODEL_DIR = 'models/'
-# MODEL_REPOSITORY_OPENXLAB = 'flyer/OculiChatDA'
-MODEL_REPOSITORY_OPENXLAB = 'OpenLMLab/internlm2-chat-7b'
+MODEL_REPOSITORY_OPENXLAB = 'flyer/OculiChatDA'
+# MODEL_REPOSITORY_OPENXLAB = 'OpenLMLab/internlm2-chat-7b'
 
 if __name__ == '__main__':
     print('服务器cuda版本检测：')
     os.system('ls /usr/local')
     if not os.path.exists(MODEL_DIR):
-        from openxlab.model import download
-
-        download(model_repo=MODEL_REPOSITORY_OPENXLAB, output=MODEL_DIR)
+        os.system(
+            'git clone -b v1 https://code.openxlab.org.cn/flyer/OculiChatDA.git {}'
+            .format(MODEL_DIR))
+        os.system(f'cd {MODEL_DIR} && git lsf pull')
+        # download(model_repo=MODEL_REPOSITORY_OPENXLAB, output=MODEL_DIR)
 
         print('解压后目录结果如下：')
         print(os.listdir(MODEL_DIR))
