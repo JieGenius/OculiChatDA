@@ -1,4 +1,5 @@
 import json
+import os.path
 
 from lmdeploy import GenerationConfig, TurbomindEngineConfig, pipeline
 from tqdm import tqdm
@@ -7,7 +8,7 @@ from tools.data_prepare.merge import judge_is_relative_to_eye
 
 PROMPT = """你是一名数据筛选工程师，这些数据为医生和患者的对话数据，部分数据包含个人信息，还有一些数据为无用的数据，或者低质量的数据。
 当数据符合要求时，你需要输出"合格"，否则输出"不合格"。用户输入时，D代表医生，P代表患者。
-当输入的问诊数据和**眼科**不想关时，你也需要输出"不合格"。
+当输入的问诊数据和**眼科**不想关时，你也需要输出"不合格"。在评价"合格"时应该保持严谨。
 下面是一些示例。
 ## 示例1:
 Input:
@@ -115,12 +116,26 @@ def main():
 
     with open(med_dialog_path) as f:
         data = json.load(f)
+
     final_res = []
+    start_idx = 0
+    if os.path.exists('data/processed_data/med_dialog_v2.json'):
+        with open('data/processed_data/med_dialog_v2.json') as f:
+            final_res = json.load(f)
+        for item in data:
+            if item[0].lstrip(
+                    '病人：') == final_res[-1]['conversation'][0]['input']:
+                start_idx = data.index(item)
+                print('已经处理的数据：', start_idx, '筛选有效的数据：', len(final_res),
+                      '筛选比例：',
+                      len(final_res) / start_idx)
+                break
+
     valid_cnt = 0
     invalid_cnt = 0
     processed = 0
     total = len(data)
-    for item in tqdm(data):
+    for item in tqdm(data[start_idx:]):
         processed += 1
         tmp = {'conversation': []}
         assert len(item) % 2 == 0

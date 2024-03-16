@@ -15,7 +15,7 @@ if __name__ == '__main__':
     os.system('ls /usr/local')
     if not os.path.exists(MODEL_DIR):
         os.system(
-            'git clone -b v1 https://code.openxlab.org.cn/flyer/OculiChatDA.git {}'
+            'git clone -b v1 --depth 1 https://code.openxlab.org.cn/flyer/OculiChatDA.git {}'
             .format(MODEL_DIR))
         os.system(f'cd {MODEL_DIR} && git lsf pull')
         # download(model_repo=MODEL_REPOSITORY_OPENXLAB, output=MODEL_DIR)
