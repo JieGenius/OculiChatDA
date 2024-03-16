@@ -135,3 +135,7 @@ Action代码 [fundus_diagnosis.py](utils/actions/fundus_diagnosis.py)
 - [ ] 视频问诊，数字人接入。
 - [ ] 问诊数据集扩充，增加更多真实的问诊数据
 - [ ] Agent能力扩充，识别更多的眼病（如中心性浆液，病理性近视，视网膜脱离等），更多的模态（如OCT，裂隙灯，眼表照相等），
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=JieGenius/OculiChatDA&type=Date)](https://star-history.com/#JieGenius/OculiChatDA&Date)
