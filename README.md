@@ -138,4 +138,11 @@ Action代码 [fundus_diagnosis.py](utils/actions/fundus_diagnosis.py)
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=JieGenius/OculiChatDA&type=Date)](https://star-history.com/#JieGenius/OculiChatDA&Date)
+
+<a href="https://star-history.com/#JieGenius/OculiChatDA&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=JieGenius/OculiChatDA&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=JieGenius/OculiChatDA&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=JieGenius/OculiChatDA&type=Date" />
+  </picture>
+</a>
