@@ -17,11 +17,12 @@ if __name__ == '__main__':
         os.system(
             'git clone -b v1 --depth 1 https://code.openxlab.org.cn/flyer/OculiChatDA.git {}'
             .format(MODEL_DIR))
-        os.system(f'cd {MODEL_DIR} && git lsf pull')
+        os.system(f'cd {MODEL_DIR} && git lfs pull')
         # download(model_repo=MODEL_REPOSITORY_OPENXLAB, output=MODEL_DIR)
 
         print('解压后目录结果如下：')
         print(os.listdir(MODEL_DIR))
+        os.system("ls -ahl {}".format(MODEL_DIR))
         os.system(f'lmdeploy convert internlm2-chat-7b {MODEL_DIR}')
     import torch
     print('torch.cuda.is_available():', torch.cuda.is_available())
